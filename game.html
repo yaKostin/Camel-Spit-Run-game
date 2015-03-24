@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+   <!-- Head........................................................-->
+
+	<head>
+	   <title>Snail Bait</title>
+      <link rel='stylesheet' href='game.css'/>
+   </head>
+
+   <!-- Body........................................................-->
+
+   <body>
+      <!-- Wrapper..................................................-->
+
+      <div id='wrapper'>
+         <!-- Toast...................................................-->
+
+         <div id='toast'>
+         </div>
+   
+         <!-- Header..................................................-->
+
+         <div id='header'>
+            <div id='score'>0</div>
+            <div id='fps'></div>
+         </div>
+            
+         <!-- Arena..................................................-->
+
+         <div id='arena'>
+            <!-- The game canvas.....................................-->
+
+            <canvas id='game-canvas'>
+               Your browser does not support HTML5 Canvas.
+            </canvas>
+         </div>
+      </div>
+
+      <!-- JavaScript................................................-->
+
+      <script src='js/requestNextAnimationFrame.js'></script>
+      <script src='game.js'></script>
+  </body>
+</html>

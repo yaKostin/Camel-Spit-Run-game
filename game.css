@@ -1,0 +1,71 @@
+body {
+   margin: 0;
+   padding: 0;
+}
+
+#arena {
+   text-align: center;
+}
+
+#wrapper {
+   margin: 0 auto;
+}
+         
+#score {
+   position: absolute;
+   font: 46px fantasy;
+   text-align: center;
+   color: #ff0;
+   text-shadow: 2px 2px 4px rgba(0,0,80,1.0);
+}
+
+#wrapper #header h1 {
+   font: 26px fantasy;
+   margin: 0 auto;
+   padding: 0;
+   margin-bottom: 0px;
+   color: #ddf;
+   text-shadow: 1px 1px 2px rgb(0,0,0);
+   color: navy;
+   text-shadow: 1px 1px 1px rgb(235,235,235);
+}
+
+#game-canvas {
+   position: relative;
+}
+
+#fps {
+   position: absolute;
+   margin-left: 12px;
+   z-index: 1;
+   color: yellow;
+   text-shadow: 1px 1px 1px rgb(0,0,80);
+   font: bold 20px fantasy;
+}
+
+#toast {
+   position: absolute;
+   margin-left: auto;
+   margin-right: auto;
+   left: 0;
+   right: 0;
+   font: 40px fantasy;
+   text-align: center;
+   color: #ff6;
+   text-shadow: 2px 2px 4px rgb(0,0,0);
+
+   -webkit-transition: opacity 0.5s;
+   -moz-transition: opacity 0.5s;
+   -o-transition: opacity 0.5s;
+   transition: opacity 0.5s;
+
+   z-index: 1;
+   opacity: 0;
+   display: none;
+}
+
+#load-link {
+   color: yellow;
+   text-decoration: none;
+   cursor: pointer;
+}
