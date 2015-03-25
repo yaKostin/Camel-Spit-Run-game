@@ -244,10 +244,39 @@ CamelGame.prototype = {
          CamelGame.start();
       };
    },
+
+   //change track to upper
+   trackUp: function() {
+    if (this.runnerTrack === 3) {
+        return
+    }
+    this.runnerTrack++;
+   },
+
+   //change track to lower
+   trackDown: function() {
+    if (this.runnerTrack === 1) {
+        return;
+    }
+    this.runnerTrack--;
+   }
 };
    
 // Event handlers.......................................................
    
+   //touch on canvas - camel must change track
+document.getElementById('game-canvas').addEventListener("touchstart", function(e) {
+    var touch = e.touches[0]; 
+    var trackHeight = CamelGame.canvas.height / 4;
+    var trackNum = 4 - parseInt(touch.pageY / trackHeight);
+    if (trackNum > CamelGame.runnerTrack) {
+        CamelGame.trackUp();
+    }
+    else if (trackNum < CamelGame.runnerTrack) {
+        CamelGame.trackDown();
+    }
+}, false);
+
 window.onkeydown = function (e) {
    var key = e.keyCode;
 
@@ -256,20 +285,17 @@ window.onkeydown = function (e) {
    }
    
    else if (key === 74) { // 'j'
-      if (CamelGame.runnerTrack === 3) {
-         return;
-      }
-
-      CamelGame.runnerTrack++;
+      CamelGame.trackUp();
    }
    else if (key === 70) { // 'f'
-      if (CamelGame.runnerTrack === 1) {
-         return;
-      }
-
-      CamelGame.runnerTrack--;
+      CamelGame.trackDown();
    }
 };
+
+window.onresize = function(e) { // change canvas size when window resize
+    CamelGame.canvas.width = window.innerWidth;
+    CamelGame.canvas.height = window.innerHeight;
+}
 
 window.onblur = function (e) {  // pause if unpaused
    CamelGame.windowHasFocus = false;
@@ -278,6 +304,8 @@ window.onblur = function (e) {  // pause if unpaused
       CamelGame.togglePaused();
    }
 };
+
+
 
 window.onfocus = function (e) {  // unpause if paused
    var originalFont = CamelGame.toast.style.fontSize;
