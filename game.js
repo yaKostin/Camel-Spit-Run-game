@@ -25,7 +25,7 @@ var CamelGame =  function () {
    this.PAUSED_CHECK_INTERVAL = 200,
 
    this.RUNNER_HEIGHT = 142,
-       this.RUNNER_CELLS_HEIGHT = 60,
+       this.RUNNER_CELLS_HEIGHT = 142,
 
    this.STARTING_BACKGROUND_VELOCITY = 0,
 
@@ -89,11 +89,23 @@ var CamelGame =  function () {
 
 // Sprite artists...................................................
   //  this.runner.runAnimationRate = 17; //fps
-    this.camelCells = [
+    /*this.camelCells = [
         {left: 0, top: 90, width: 64, height: 50},
         {left: 128, top: 90, width: 73, height: 50},
         {left: 201, top: 90, width: 73, height: 50},
         {left: 274, top: 90, width: 64, height: 50}
+    ];*/
+    this.posSpriteTop=159;
+    this.SpriteHeight=92;
+    this.camelCells = [
+     //   {left: 0, top: this.posSpriteTop, width: 112, height: this.SpriteHeight},  //1
+        {left: 114, top: this.posSpriteTop, width: 120, height: this.SpriteHeight},  //2
+        {left: 232, top: this.posSpriteTop, width: 126, height: this.SpriteHeight},  //3
+        {left: 360, top: this.posSpriteTop, width: 130, height: this.SpriteHeight},  //4
+        {left: 490, top: this.posSpriteTop, width: 130, height: this.SpriteHeight},  //5
+        {left: 625, top: this.posSpriteTop, width: 135, height: this.SpriteHeight},  //6
+        {left: 760, top: this.posSpriteTop, width: 137, height: this.SpriteHeight},  //7
+        {left: 898, top: this.posSpriteTop, width: 135, height: this.SpriteHeight},  //8
     ];
 
     this.runnerArtist = new SpriteSheetArtist(this.spritesheet, this.camelCells);
@@ -156,8 +168,7 @@ var CamelGame =  function () {
                     if (sprite.track !== 3) {
                         sprite.track++;
                     }
-                    sprite.top = this.calculatePlatformTop(sprite.track) -
-                    this.RUNNER_CELLS_HEIGHT;
+                    sprite.top = CamelGame.calculatePlatformTop(sprite.track) -  CamelGame.RUNNER_CELLS_HEIGHT;
 
                     sprite.jumping = false; // immediately done jumping for now
                 }
@@ -170,8 +181,7 @@ var CamelGame =  function () {
                     if (sprite.track !== 1) {
                         sprite.track--;
                     }
-                    sprite.top = this.calculatePlatformTop(sprite.track) -
-                    this.RUNNER_CELLS_HEIGHT;
+                    sprite.top = CamelGame.calculatePlatformTop(sprite.track) -  CamelGame.RUNNER_CELLS_HEIGHT;
 
                     sprite.falling = false; // immediately done falling for now
                 }
@@ -366,7 +376,7 @@ CamelGame.prototype = {
 
     turnRight: function () {
         this.bgVelocity = this.BACKGROUND_VELOCITY;
-        this.runner.runAnimationRate = 17;
+        this.runner.runAnimationRate = 10;
         this.runnerArtist.cells = this.camelCells;
         this.runner.direction = this.RIGHT;
     },
@@ -483,7 +493,7 @@ this.turnRight();
    initializeImages: function () {
       this.background.src = 'images/background-l1.png';
    //   this.runnerImage.src = 'images/camel.png';
-       this.spritesheet.src = 'images/sprite_camel.png';
+       this.spritesheet.src = 'images/sprite_camel_big.png';
       this.background.onload = function (e) {
          CamelGame.start();
       };
@@ -611,7 +621,7 @@ CamelGame.runner.jump();
       if (CamelGame.runnerTrack === 1) {
          return;
       }
-       CamelGame.runner.jump();
+       CamelGame.runner.fall();
       CamelGame.runnerTrack--;
    }
 };
