@@ -1,71 +1,31 @@
 /**
  * Created by Daniil on 25.03.2015.
  */
-var Sprite = function (type, artist, behaviors) { // конструктор
-    this.type = type || '';
-    this.artist = artist || undefined;
-    this.behaviors = behaviors || [];
 
-    this.left = 0;
-    this.top = 0; this.width = 10;  // Нечто отличное от нуля, что не имеет смысла
-    this.height = 10;  // Нечто отличное от нуля, что не имеет смысла
-    this.velocityX = 0;
-    this.velocityY = 0;
-    this.opacity = 1.0;
-    this.visible = true;
-
-    return this;
+var ImageArtist = function (imageUrl) {
+    this.image = new Image;
+    this.image.src = 'img/sprite-camel.png';
 };
 
-Sprite.prototype = { // Методы
-    draw: function (context) {
-        context.save();
+ImageArtist.prototype = {
+    image: undefined,
 
-        // Вызовы save() и restore() делают настройку globalAlpha временной
-
-        context.globalAlpha = this.opacity;
-
-        if (this.artist && this.visible) {
-            this.artist.draw(this, context);
-        }
-
-        context.restore();
+    drawSpriteImage: function (sprite, context) {
+        context.drawImage(this.image, sprite.left, sprite.top);
     },
 
-    update: function (time, fps) {
-        for (var i=0; i < this.behaviors.length; ++i) {
-            if (this.behaviors[i] === undefined) { // Изменен во время цикла?
-                return;
-            }
-
-            this.behaviors[i].execute(this, time, fps);
-        }
-    }
-};
-
-// ImageArtists создает растровое изображение
-
-var ImageArtist = function (imageUrl) { // конструктор
-    this.image = new Image();
-    this.image.src = 'images/sprite_camel.png';
-};
-
-ImageArtist.prototype = { // Методы
     draw: function (sprite, context) {
-        context.drawImage(this.image, sprite.left, sprite.top);
+        this.drawSpriteImage(sprite, context);
     }
 };
 
-// Начертатели на основе страницы спрайтов создают растровое изображение,
-// взятое со страницы спрайтов
-
-SpriteSheetArtist = function (spritesheet, cells) { // конструктор
+SpriteSheetArtist = function (spritesheet, cells) {
     this.cells = cells;
     this.spritesheet = spritesheet;
     this.cellIndex = 0;
 };
 
-SpriteSheetArtist.prototype = { // Методы
+SpriteSheetArtist.prototype = {
     advance: function () {
         if (this.cellIndex == this.cells.length-1) {
             this.cellIndex = 0;
@@ -78,10 +38,89 @@ SpriteSheetArtist.prototype = { // Методы
     draw: function (sprite, context) {
         var cell = this.cells[this.cellIndex];
 
-        context.drawImage(this.spritesheet,
-            cell.left,   cell.top,     // исходное значение x, исходное значение y
-            cell.width,  cell.height,  // исходная ширина, исходная высота
-            sprite.left, sprite.top,   // конечное значение x, конечное значение y
-            cell.width,  cell.height); // конечная ширина, конечная высота
+        context.drawImage(this.spritesheet, cell.left, cell.top,
+            cell.width, cell.height,
+            sprite.left, sprite.top,
+            cell.width, cell.height);
     }
 };
+
+// Sprite Animators...........................................................
+
+var SpriteAnimator = function (cells, duration, callback) {
+    this.cells = cells;
+    this.duration = duration || 1000;
+    this.callback = callback;
+};
+
+SpriteAnimator.prototype = {
+    start: function (sprite, reappear) {
+        var originalCells = sprite.artist.cells,
+            originalIndex = sprite.artist.cellIndex,
+            self = this;
+
+        sprite.artist.cells = this.cells;
+        sprite.artist.cellIndex = 0;
+
+        setTimeout(function() {
+            sprite.artist.cells = originalCells;
+            sprite.artist.cellIndex = originalIndex;
+
+            sprite.visible = reappear;
+
+            if (self.callback) {
+                self.callback(sprite, self);
+            }
+        }, self.duration);
+    }
+};
+
+// Sprites....................................................................
+
+// Sprites have a type, an artist, and an array of behaviors. Sprites can
+// be updated and drawn.
+//
+// A sprite's artist draws the sprite: draw(sprite, context)
+// A sprite's behavior executes: execute(sprite, time, fps)
+
+var Sprite = function (type, artist, behaviors) {
+    this.type = type || '';
+    this.artist = artist || undefined;
+    this.behaviors = behaviors || [];
+
+    this.left = 0;
+    this.top = 0;
+    this.width = 10;
+    this.height = 10;
+    this.velocityX = 0;
+    this.velocityY = 0;
+    this.opacity = 1.0;
+    this.visible = true;
+
+    return this;
+};
+
+Sprite.prototype = {
+    draw: function (context) {
+        context.save();
+        context.globalAlpha = this.opacity;
+
+        if (this.artist && this.visible) {
+            this.artist.draw(this, context);
+        }
+        context.restore();
+    },
+
+    update: function (time, fps) {
+        for (var i = 0; i < this.behaviors.length; ++i) {
+            if (this.behaviors[i] === undefined) { // Modified while looping?
+                return;
+            }
+
+            this.behaviors[i].execute(this, time, fps);
+        }
+    }
+};
+
+
+
