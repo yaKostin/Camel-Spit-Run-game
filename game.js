@@ -162,7 +162,7 @@ var CamelGame =  function () {
             }
         },
 
-        this.jumpBehavior = {
+        this.upBehavior = {
             execute: function(sprite, time, fps) {
                 if (sprite.jumping) {
                     if (sprite.track !== 3) {
@@ -175,7 +175,7 @@ var CamelGame =  function () {
             }
         },
 
-        this.fallBehavior = {
+        this.dawnBehavior = {
             execute: function(sprite, time, fps) {
                 if (sprite.falling) {
                     if (sprite.track !== 1) {
@@ -247,8 +247,8 @@ var CamelGame =  function () {
         this.runner = new Sprite('runner',          // type
             this.runnerArtist, // artist
             [ this.runBehavior, // behaviors
-                this.jumpBehavior,
-                this.fallBehavior
+                this.upBehavior,
+                this.dawnBehavior
             ]);
 
     // All sprites.......................................................
