@@ -12,7 +12,26 @@
         height: 100%;
         color: #fff;
         text-align: right;
-        line-height: 22px; /* same as #progressBar height if we want text middle aligned */
+        line-height: 22px; 
         width: 0;
         background-color: #0099ff;
+}
+#progress {
+		 width:963px;
+		 position:absolute; 
+		 height:30px; 
+		 z-index:1000; 
+		 right: 10px; 
+		 top:10px;
+	}
+#helthdiv{
+		width:431;
+		float:right; 
+		margin-left:100px;
+}
+#manadiv{
+		width:423;
+}
+img{
+		height:22px;
 }
