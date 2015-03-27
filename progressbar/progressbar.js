@@ -1,9 +1,18 @@
+var ProgressBar = function(elementName) {
+	this.value = 100,
+	this.progressBarElement = $(elementName);
+};
 
-function progress(percent, $element) { 
-    var progressBarWidth = percent * $element.width() / 100;
-    $element.find('div').animate({ width: progressBarWidth }, 500).html(percent + "%&nbsp;");
-}
-$( document ).ready(function() {
-    progress(80, $('.progressBar'));
-});
-
+ProgressBar.prototype = {
+	adjustValue: function(value) {
+		if (value) {
+			this.value += value;
+			if (this.value > 100) {
+				this.value = 100;
+			}
+		}
+		var bar = this.progressBarElement.find('.progressBar');
+		var width = this.value * bar.width() / 100;
+	    bar.find('div').animate({ width: width }, 500).html(this.value + "%&nbsp;");
+	},
+};

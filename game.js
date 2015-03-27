@@ -10,6 +10,9 @@ var CamelGame =  function () {
 
     this.fpsElement = document.getElementById('fps'),
     this.toast = document.getElementById('toast'),
+    this.scoreElement = document.getElementById('score'),
+    this.healthProgressBar = new ProgressBar('#health'),
+    this.waterProgressBar = new ProgressBar('#water'),
 
     // Constants............................................................
 
@@ -287,17 +290,89 @@ var CamelGame =  function () {
         }
     },
 
-   /* this.snailBombMoveBehavior = {
-        execute: function(sprite, time, fps) {  // sprite is the bomb
-            if (sprite.visible && this.spriteInView(sprite)) {
-                sprite.left -= this.SNAIL_BOMB_VELOCITY / fps;
+    this.collideBehavior = {
+        execute: function (sprite, time, fps, context) {
+            var otherSprite;
+
+            for (var i=0; i < CamelGame.sprites.length; ++i) { 
+                otherSprite = CamelGame.sprites[i];
+
+                if (this.isCandidateForCollision(sprite, otherSprite)) {
+                    if (this.didCollide(sprite, otherSprite, context)) { 
+                        this.processCollision(sprite, otherSprite);
+                    }
+                }
+            }
+        },
+
+        isCandidateForCollision: function (sprite, otherSprite) {
+            return sprite !== otherSprite &&
+                sprite.visible && otherSprite.visible &&
+                !sprite.exploding && !otherSprite.exploding &&
+                otherSprite.left - otherSprite.offset < sprite.left - sprite.offset + sprite.width;
+        }, 
+
+        didRunnerCollideWithOtherSprite: function (left, top, right, bottom,
+                                                 centerX, centerY,
+                                                 otherSprite, context) {
+         // Determine if either of the runner's four corners or its
+         // center lie within the other sprite's bounding box. 
+
+            context.beginPath();
+            context.rect(otherSprite.left - otherSprite.offset, otherSprite.top,
+                    otherSprite.width, otherSprite.height);
+
+            return context.isPointInPath(left,    top)     ||
+                context.isPointInPath(right,   top)     ||
+
+                context.isPointInPath(centerX, centerY) ||
+
+                context.isPointInPath(left,    bottom)  ||
+                context.isPointInPath(right,   bottom);
+        },
+     
+        didCollide: function (sprite, otherSprite, context) {
+            var MARGIN_TOP = 10,
+                MARGIN_LEFT = 10,
+                MARGIN_RIGHT = 10,
+                MARGIN_BOTTOM = 0,
+                left = sprite.left + sprite.offset + MARGIN_LEFT,
+                right = sprite.left + sprite.offset + sprite.width - MARGIN_RIGHT,
+                top = sprite.top + MARGIN_TOP,
+                bottom = sprite.top + sprite.height - MARGIN_BOTTOM,
+                centerX = left + sprite.width/2,
+                centerY = sprite.top + sprite.height/2;
+
+            return this.didRunnerCollideWithOtherSprite(left, top, right, bottom,
+                                                  centerX, centerY,
+                                                  otherSprite, context);
+        },
+
+        processCollision: function (sprite, sprite) {
+            if (sprite.value) { // Modify Snail Bait sprites so they have values
+            // Keep score...
             }
 
-            if (!this.spriteInView(sprite)) {
-                sprite.visible = false;
+            switch(sprite.type) {
+                case 'bush':
+                        CamelGame.increaseHealth(sprite);
+                    break;
+                case 'oasis':
+                        CamelGame.increaseWater(sprite);
+                    break;
+                case 'palm':
+                        CamelGame.decreaseHealth(sprite);
+                    break;
+                case 'pyramid':
+                        CamelGame.decreaseHealth(sprite);
+                    break;
+                case 'tourist':
+                        sprite.visible = false;
+                        CamelGame.splashToast('Попал в кадр!', 1000);
+                    break;
             }
-        }
-    },*/
+        },
+    }
 
     // Sprites...........................................................
 
@@ -311,7 +386,8 @@ var CamelGame =  function () {
         this.runnerArtist, // artist
         [ this.runBehavior, // behaviors
             this.upBehavior,
-            this.downBehavior
+            this.downBehavior,
+            this.collideBehavior
         ]);
 
     // All sprites.......................................................
@@ -381,41 +457,41 @@ CamelGame.prototype = {
         }
     },
    
-   drawBackground: function () {
-      this.context.save();
-   
-      this.context.globalAlpha = 1.0;
-      this.context.translate(-this.backgroundOffset, 0);
-   
-      // Initially onscreen:
-      //this.context.drawImage(this.background, 0, 0, this.background.width, this.background.height);
-      this.context.drawImage(this.background, 0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
-   
-      // Initially offscreen:
-      //this.context.drawImage(this.background, this.background.width, 0, this.background.width+1, this.background.height);
-      this.context.drawImage(this.background, this.canvas.clientWidth, 0, this.canvas.clientWidth+1, this.canvas.clientHeight);
-   
-      this.context.restore();
-   },
-   
-   calculateFps: function (now) {
-      var fps;
+    drawBackground: function () {
+        this.context.save();
 
-      if (this.lastAnimationFrameTime === 0) {
-         this.lastAnimationFrameTime = now;
-         return 60;
-      }
+        this.context.globalAlpha = 1.0;
+        this.context.translate(-this.backgroundOffset, 0);
 
-      fps = 1000 / (now - this.lastAnimationFrameTime);
-      this.lastAnimationFrameTime = now;
-   
-      if (now - this.lastFpsUpdateTime > 1000) {
-         this.lastFpsUpdateTime = now;
-         this.fpsElement.innerHTML = fps.toFixed(0) + ' fps';
-      }
+        // Initially onscreen:
+        //this.context.drawImage(this.background, 0, 0, this.background.width, this.background.height);
+        this.context.drawImage(this.background, 0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
 
-      return fps; 
-   },
+        // Initially offscreen:
+        //this.context.drawImage(this.background, this.background.width, 0, this.background.width+1, this.background.height);
+        this.context.drawImage(this.background, this.canvas.clientWidth, 0, this.canvas.clientWidth+1, this.canvas.clientHeight);
+
+        this.context.restore();
+    },
+
+    calculateFps: function (now) {
+        var fps;
+
+        if (this.lastAnimationFrameTime === 0) {
+            this.lastAnimationFrameTime = now;
+            return 60;
+        }
+
+        fps = 1000 / (now - this.lastAnimationFrameTime);
+        this.lastAnimationFrameTime = now;
+
+        if (now - this.lastFpsUpdateTime > 1000) {
+            this.lastFpsUpdateTime = now;
+            this.fpsElement.innerHTML = fps.toFixed(0) + ' fps';
+        }
+
+        return fps; 
+    },
 
     calculatePlatformTop: function (track) {
         var top;
@@ -435,7 +511,22 @@ CamelGame.prototype = {
     },
 
    // Sprites..............................................................
- 
+    
+    increaseWater: function(sprite) {
+        sprite.visible = false;
+        this.waterProgressBar.adjustValue(sprite.value);
+    },
+
+    increaseHealth: function(sprite) {
+        sprite.visible = false;
+        this.healthProgressBar.adjustValue(sprite.value);
+    },
+
+    decreaseHealth: function(sprite) {
+        sprite.visible = false;
+        this.healthProgressBar.adjustValue(sprite.value);
+    },
+
     explode: function (sprite, silent) {
         sprite.exploding = true;
         this.explosionAnimator.start(sprite, true);  // true means sprite reappears
@@ -535,6 +626,8 @@ CamelGame.prototype = {
         this.initializeImages();
         this.equipRunner();
 
+        this.healthProgressBar.adjustValue();
+        this.waterProgressBar.adjustValue();
         this.bgVelocity = this.BACKGROUND_VELOCITY;
         CamelGame.splashToast('Good Luck!', 2000);
 
@@ -573,7 +666,7 @@ CamelGame.prototype = {
             sprite = this.sprites[i];
 
             if (sprite.visible && this.spriteInView(sprite)) {
-                sprite.update(now, this.fps);
+                sprite.update(now, this.fps, this.context);
             }
         }
     },
@@ -665,6 +758,8 @@ CamelGame.prototype = {
             oasis.width = this.OASIS_WIDTH;
             oasis.height = this.OASIS_HEIGHT;
 
+            oasis.value = 10;
+
             this.oases.push(oasis);
         }
     },
@@ -678,6 +773,8 @@ CamelGame.prototype = {
 
             pyramid.width = this.PYRAMID_WIDTH;
             pyramid.height = this.PYRAMID_HEIGHT;
+
+            pyramid.value = -20;
 
             this.pyramids.push(pyramid);
         }
@@ -693,6 +790,8 @@ CamelGame.prototype = {
             bush.width = this.BUSH_WIDTH;
             bush.height = this.BUSH_HEIGHT;
 
+            bush.value = 10;
+
             this.bushes.push(bush);
         }
     },
@@ -706,6 +805,8 @@ CamelGame.prototype = {
 
             palm.width = this.PALM_WIDTH;
             palm.height = this.PALM_HEIGHT;
+
+            palm.value = -10;
 
             this.palms.push(palm);
         }
