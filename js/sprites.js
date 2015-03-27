@@ -41,7 +41,8 @@ SpriteSheetArtist.prototype = {
         context.drawImage(this.spritesheet, cell.left, cell.top,
             cell.width, cell.height,
             sprite.left, sprite.top,
-            cell.width, cell.height);
+            //cell.width, cell.height);
+            sprite.width, sprite.height);
     }
 };
 
@@ -92,6 +93,7 @@ var Sprite = function (type, artist, behaviors) {
     this.top = 0;
     this.width = 10;
     this.height = 10;
+    this.offset = 0;
     this.velocityX = 0;
     this.velocityY = 0;
     this.opacity = 1.0;
