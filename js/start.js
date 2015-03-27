@@ -11,7 +11,7 @@ $(document).ready(function(){
 
 	// start
 	$('#start_btn').click(function(){
-		window.location = "/game.html";
+		window.location = "game.html";
 	});
 
 	// settings dropdown
