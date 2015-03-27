@@ -5,6 +5,7 @@
 	   <title>Spit & Run</title>
       <link rel='stylesheet' href='css/normalize.css'/>
       <link rel='stylesheet' href='game.css'/>
+	  <link rel='stylesheet' href='progressbar.css'/>
    </head>
 
    <body>
@@ -21,23 +22,46 @@
          <div id='header'>
             <div id='score'>0</div>
             <div id='fps'></div>
+			<!--Progress bar............................................... -->
+			<div id="progress">
+				<div id="helthdiv">
+					<img src="progressbar/cross.png">
+					<div class="progressBar">
+						<div style="background-color:red"></div>
+					</div>
+				</div>
+				<div id="manadiv">
+					<img src="progressbar/drop.png" style="margin-left:10px">
+					<div class="progressBar">
+						<div></div>
+					</div>
+				</div>
+			</div>
          </div>
             
          <!-- Arena..................................................-->
 
          <div id='arena'>
             <!-- The game canvas.....................................-->
-
+			
+		
             <canvas id='game-canvas'>
                Your browser does not support HTML5 Canvas.
             </canvas>
+			
+	 
+           
          </div>
       </div>
+	  
+	  
 
       <!-- JavaScript................................................-->
 
       <script src='js/requestNextAnimationFrame.js'></script>
       <script src='js/sprites.js'></script>
       <script src='game.js'></script>
+	  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	  <script src='progressbar/progressbar.js'></script>
   </body>
 </html>
