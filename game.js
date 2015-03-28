@@ -387,7 +387,7 @@ var CamelGame =  function () {
         [ this.runBehavior, // behaviors
             this.upBehavior,
             this.downBehavior,
-            this.collideBehavior
+            //this.collideBehavior
         ]);
 
     // All sprites.......................................................
