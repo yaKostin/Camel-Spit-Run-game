@@ -27,7 +27,7 @@ var CamelGame =  function () {
 
     this.PAUSED_CHECK_INTERVAL = 200,
 
-    this.CAMEL_CELLS_HEIGHT = 82,
+    this.CAMEL_CELLS_HEIGHT = 90,
 
     this.STARTING_BACKGROUND_VELOCITY = 0,
 
@@ -62,7 +62,7 @@ var CamelGame =  function () {
     this.PYRAMID_HEIGHT = 90,
 
     this.CAMEL_WIDTH = 120,
-    this.CAMEL_HEIGHT = 80,
+    this.CAMEL_HEIGHT = 90,
 
     this.BUSH_WIDTH = 90,
     this.BUSH_HEIGHT = 90,
@@ -124,16 +124,16 @@ var CamelGame =  function () {
   //  this.runner.runAnimationRate = 17; //fps
  
     this.camelCells = [
-        {left: 0, top: 0, width: 114, height: 81},  //2
-        {left: 235, top: 0, width: 114, height: 81},  //3
-        {left: 365, top: 0, width: 123, height: 81},  //4
-        {left: 494, top: 0, width: 130, height: 81},  //5
-        {left: 627, top: 0, width: 135, height: 81},  //6
-        {left: 766, top: 0, width: 137, height: 81},  //7
-        {left: 904, top: 0, width: 135, height: 81},  //8
-        {left: 1037, top: 0, width: 117, height: 81},  //8
-        {left: 1162, top: 0, width: 115, height: 81},  //8
-        {left: 1280, top: 0, width: 117, height: 81},  //8
+        {left: 0, top: 0, width: 117, height: 90},  //2
+        {left: 235, top: 0, width: 125, height: 90},  //3
+        {left: 365, top: 0, width: 123, height: 90},  //4
+        {left: 494, top: 0, width: 130, height: 90},  //5
+        {left: 627, top: 0, width: 138, height: 90},  //6
+        {left: 766, top: 0, width: 137, height: 90},  //7
+        {left: 902, top: 0, width: 135, height: 90},  //8
+        {left: 1037, top: 0, width: 117, height: 90},  //8
+        {left: 1162, top: 0, width: 115, height: 90},  //8
+        {left: 1280, top: 0, width: 117, height: 90},  //8
     ],
 
     this.oasisCells = [
