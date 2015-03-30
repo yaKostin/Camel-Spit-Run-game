@@ -236,13 +236,13 @@ var CamelGame = function () {
 
         this.downBehavior = {
             execute: function (sprite, time, fps) {
-                if (sprite.falling) {
+                if (sprite.changing_track_down) {
                     if (sprite.track !== 1) {
                         sprite.track--;
                     }
                     sprite.top = CamelGame.calculatePlatformTop(sprite.track) - CamelGame.CAMEL_CELLS_HEIGHT;
 
-                    sprite.falling = false; // immediately done falling for now
+                    sprite.changing_track_down = false; // immediately done falling for now
                 }
             }
         },
@@ -369,7 +369,7 @@ var CamelGame = function () {
                         CamelGame.splashToast('Попал в кадр!', 1000);
                         break;
                 }
-            },
+            }
         }
 
     // Sprites...........................................................
@@ -549,8 +549,23 @@ CamelGame.prototype = {
         this.runner.artist.cells = this.camelCells;
 
         this.runner.changing_track = false;
+        this.runner.changing_track_down = false;
         this.runner.jumping = false;
         this.runner.falling = false;
+
+        this.runner.up = function () {
+            // this method is essentially a switch that turns
+            // on the runner's jumping behavior
+
+            this.changing_track = !this.changing_track // 'this' is the runner
+        };
+
+        this.runner.down = function () {
+            // this method is essentially a switch that turns
+            // on the runner's falling behavior
+
+            this.changing_track_down = !this.changing_track_down // 'this' is the runner
+        };
 
         this.equipRunnerForJumping();
         this.equipRunnerForFalling();
@@ -859,7 +874,7 @@ CamelGame.prototype = {
 
             this.palms.push(palm);
         }
-    },
+    }
 };
 
 // Event handlers.......................................................
@@ -890,24 +905,24 @@ window.onkeydown = function (e) {
         if (CamelGame.runnerTrack === 3) {
             return;
         }
-        CamelGame.runner.jump();
+        CamelGame.runner.up();
         CamelGame.runnerTrack++;
     }
     else if (key === 70) { // 'f'
         if (CamelGame.runnerTrack === 1) {
             return;
         }
-        CamelGame.runner.fall();
+        CamelGame.runner.down();
         CamelGame.runnerTrack--;
     }
-  /*  else if (key === 32) { // 'space'
+ /*   else if (key === 32) { // 'space'
         if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
             CamelGame.runner.jump();
         }
     }*/
-} ;
+}
 
-    window.onresize = function (e) { // change canvas size when window resize
+window.onresize = function (e) { // change canvas size when window resize
         CamelGame.canvas.width = window.innerWidth;
         CamelGame.canvas.height = window.innerHeight;
     }
