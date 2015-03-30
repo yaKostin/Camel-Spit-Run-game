@@ -39,6 +39,9 @@ var CamelGame = function () {
         this.STARTING_RUNNER_TRACK = 1,
         this.STARTING_RUNNER_VELOCITY = 0,
 
+        this.GRAVITY_FORCE = 9.81,
+        this.PIXELS_PER_METER = this.canvas.width / 10; // 10 meters, randomly selected width
+
         this.OASIS_CELLS_HEIGHT = 90,
         this.OASIS_CELLS_WIDTH = 90,
 
@@ -289,6 +292,191 @@ var CamelGame = function () {
             }
         },
 
+        //jumping
+
+        this.jumpBehavior = {
+            pause: function (sprite) {
+                if (sprite.ascendAnimationTimer.isRunning()) {
+                    sprite.ascendAnimationTimer.pause();
+                }
+                else if (!sprite.descendAnimationTimer.isRunning()) {
+                    sprite.descendAnimationTimer.pause();
+                }
+            },
+
+            unpause: function (sprite) {
+                if (sprite.ascendAnimationTimer.isRunning()) {
+                    sprite.ascendAnimationTimer.unpause();
+                }
+                else if (sprite.descendAnimationTimer.isRunning()) {
+                    sprite.descendAnimationTimer.unpause();
+                }
+            },
+
+            jumpIsOver: function (sprite) {
+                return ! sprite.ascendAnimationTimer.isRunning() &&
+                    ! sprite.descendAnimationTimer.isRunning();
+            },
+
+            // Ascent...............................................................
+
+            isAscending: function (sprite) {
+                return sprite.ascendAnimationTimer.isRunning();
+            },
+
+            ascend: function (sprite) {
+                var elapsed = sprite.ascendAnimationTimer.getElapsedTime(),
+                    deltaH  = elapsed / (sprite.JUMP_DURATION/2) * sprite.JUMP_HEIGHT;
+                sprite.top = sprite.verticalLaunchPosition - deltaH;
+            },
+
+            isDoneAscending: function (sprite) {
+                return sprite.ascendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION/2;
+            },
+
+            finishAscent: function (sprite) {
+                sprite.jumpApex = sprite.top;
+                sprite.ascendAnimationTimer.stop();
+                sprite.descendAnimationTimer.start();
+            },
+
+            // Descents.............................................................
+
+            isDescending: function (sprite) {
+                return sprite.descendAnimationTimer.isRunning();
+            },
+
+            descend: function (sprite, verticalVelocity, fps) {
+                var elapsed = sprite.descendAnimationTimer.getElapsedTime(),
+                    deltaH  = elapsed / (sprite.JUMP_DURATION/2) * sprite.JUMP_HEIGHT;
+
+                sprite.top = sprite.jumpApex + deltaH;
+            },
+
+            isDoneDescending: function (sprite) {
+                return sprite.descendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION/2;
+            },
+
+            finishDescent: function (sprite) {
+                sprite.stopJumping();
+
+          /*      if (CamelGame.isOverPlatform(sprite) !== -1) {
+                    sprite.top = sprite.verticalLaunchPosition;
+                }
+                else {
+                    sprite.fall(CamelGame.GRAVITY_FORCE *
+                    (sprite.descendAnimationTimer.getElapsedTime()/1000) *
+                    CamelGame.PIXELS_PER_METER);
+                }
+          */  },
+
+            // Execute..............................................................
+
+            execute: function(sprite, time, fps) {
+                if ( ! sprite.jumping || sprite.exploding) {
+                    return;
+                }
+
+                if (this.jumpIsOver(sprite)) {
+                    sprite.jumping = false;
+                    return;
+                }
+
+                if (this.isAscending(sprite)) {
+                    if ( ! this.isDoneAscending(sprite)) { this.ascend(sprite); }
+                    else                                 { this.finishAscent(sprite); }
+                }
+                else if (this.isDescending(sprite)) {
+                    if ( ! this.isDoneDescending(sprite)) { this.descend(sprite); }
+                    else                                  { this.finishDescent(sprite); }
+                }
+            }
+        },
+
+        // Runner's fall behavior..................................................
+
+        this.fallBehavior = {
+            isOutOfPlay: function (sprite) {
+                return sprite.top > CamelGame.TRACK_1_BASELINE;
+            },
+
+            willFallBelowCurrentTrack: function (sprite, deltaY) {
+                return sprite.top + sprite.height + deltaY >
+                    CamelGame.calculatePlatformTop(sprite.track);
+            },
+
+            fallOnPlatform: function (sprite) {
+                sprite.top = CamelGame.calculatePlatformTop(sprite.track) - sprite.height;
+                sprite.stopFalling();
+
+            },
+
+            setSpriteVelocity: function (sprite) {
+                var fallingElapsedTime;
+
+                sprite.velocityY = sprite.initialVelocityY + CamelGame.GRAVITY_FORCE *
+                (sprite.fallAnimationTimer.getElapsedTime()/1000) *
+                CamelGame.PIXELS_PER_METER;
+            },
+
+            calculateVerticalDrop: function (sprite, fps) {
+                return sprite.velocityY / fps;
+            },
+
+            isPlatformUnderneath: function (sprite) {
+                return CamelGame.isOverPlatform(sprite) !== -1;
+            },
+
+            execute: function (sprite, time, fps) {
+                var deltaY;
+
+                if (sprite.jumping) {
+                    return;
+                }
+
+                if (this.isOutOfPlay(sprite) || sprite.exploding) {
+                    if (sprite.falling) {
+                        sprite.stopFalling();
+                    }
+                    return;
+                }
+
+                if (!sprite.falling) {
+                    if (!sprite.exploding && !this.isPlatformUnderneath(sprite)) {
+                        sprite.fall();
+                    }
+                    return;
+                }
+
+                this.setSpriteVelocity(sprite);
+                deltaY = this.calculateVerticalDrop(sprite, fps);
+
+                if (!this.willFallBelowCurrentTrack(sprite, deltaY)) {
+                    sprite.top += deltaY;
+                }
+                else { // will fall below current track
+
+                    if (this.isPlatformUnderneath(sprite)) {
+                        this.fallOnPlatform(sprite);
+                        sprite.stopFalling();
+                    }
+                    else {
+                        sprite.track--;
+
+                        sprite.top += deltaY;
+
+                        if (sprite.track === 0) {
+                            CamelGame.playSound(snailBait.fallingWhistleSound);
+                            CamelGame.loseLife();
+                            sprite.stopFalling();
+                            CamelGame.reset();
+                            CamelGame.fadeAndRestoreCanvas();
+                        }
+                    }
+                }
+            }
+        },
+        //collisions
         this.collideBehavior = {
             execute: function (sprite, time, fps, context) {
                 var otherSprite;
@@ -385,6 +573,7 @@ var CamelGame = function () {
             [this.runBehavior, // behaviors
                 this.upBehavior,
                 this.downBehavior,
+                this.jumpBehavior,
                 this.collideBehavior
             ]);
 
@@ -607,7 +796,7 @@ CamelGame.prototype = {
             this.jumping = false;
             this.ascendAnimationTimer.stop();
             this.descendAnimationTimer.stop();
-            this.runAnimationRate = snailBait.RUN_ANIMATION_RATE;
+            this.runAnimationRate = 10;
         };
 
         this.runner.jump = function () {
@@ -619,7 +808,7 @@ CamelGame.prototype = {
             this.verticalLaunchPosition = this.top;
             this.ascendAnimationTimer.start();
 
-            snailBait.playSound(snailBait.jumpWhistleSound);
+
         };
     },
     // Toast................................................................
@@ -885,11 +1074,11 @@ document.getElementById('game-canvas').addEventListener("touchstart", function (
     var trackHeight = CamelGame.canvas.height / 4;
     var trackNum = 4 - parseInt(touch.pageY / trackHeight);
     if (trackNum > CamelGame.runnerTrack) {
-        CamelGame.runner.jump();
+        CamelGame.runner.up();
         CamelGame.runnerTrack++;
     }
     else if (trackNum < CamelGame.runnerTrack) {
-        CamelGame.runner.fall();
+        CamelGame.runner.down();
         CamelGame.runnerTrack--;
     }
 }, false);
@@ -915,11 +1104,11 @@ window.onkeydown = function (e) {
         CamelGame.runner.down();
         CamelGame.runnerTrack--;
     }
- /*   else if (key === 32) { // 'space'
+    else if (key === 32) { // 'space'
         if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
             CamelGame.runner.jump();
         }
-    }*/
+    }
 }
 
 window.onresize = function (e) { // change canvas size when window resize
