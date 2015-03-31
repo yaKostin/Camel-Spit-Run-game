@@ -669,7 +669,7 @@ CamelGame.prototype = {
             return 60;
         }
 
-        fps = 1000 / (now - this.lastAnimationFrameTime);
+        fps = 5000 / (now - this.lastAnimationFrameTime);
         this.lastAnimationFrameTime = now;
 
         if (now - this.lastFpsUpdateTime > 1000) {
