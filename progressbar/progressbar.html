@@ -1,43 +1,45 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script>
-function progress(percent, $element) { 
-    var progressBarWidth = percent * $element.width() / 100;
-    $element.find('div').animate({ width: progressBarWidth }, 500).html(percent + "%&nbsp;");
-}
-$( document ).ready(function() {
-    progress(80, $('.progressBar'));
-});
+    function progress(percent, $element) {
+        var progressBarWidth = percent * $element.width() / 100;
+        $element.find('div').animate({width: progressBarWidth}, 500).html(percent + "%&nbsp;");
+    }
+    $(document).ready(function () {
+        progress(80, $('.progressBar'));
+    });
 
 </script>
 <style>
-.progressBar {
-		float: right;
+    .progressBar {
+        float: right;
         width: 400px;
         height: 22px;
         border: 1px solid #111;
         background-color: #292929;
-}
- 
-.progressBar div {
+    }
+
+    .progressBar div {
         height: 100%;
         color: #fff;
         text-align: right;
         line-height: 22px; /* same as #progressBar height if we want text middle aligned */
         width: 0;
         background-color: #0099ff;
-}
+    }
 </style>
 <div style="width:895">
-	<div style="width:431;float:right">
-		<img src="cross.png" style="height:22px;">
-		<div class="progressBar">
-			<div></div>
-		</div>
-	</div>
-	<div style="width:431">
-		<img src="drop.png" style="height:22px;">
-		<div class="progressBar">
-			<div></div>
-		</div>
-	</div>
+    <div style="width:431;float:right">
+        <img src="cross.png" style="height:22px;">
+
+        <div class="progressBar">
+            <div></div>
+        </div>
+    </div>
+    <div style="width:431">
+        <img src="drop.png" style="height:22px;">
+
+        <div class="progressBar">
+            <div></div>
+        </div>
+    </div>
 </div>

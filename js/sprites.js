@@ -27,7 +27,7 @@ SpriteSheetArtist = function (spritesheet, cells) {
 
 SpriteSheetArtist.prototype = {
     advance: function () {
-        if (this.cellIndex == this.cells.length-1) {
+        if (this.cellIndex == this.cells.length - 1) {
             this.cellIndex = 0;
         }
         else {
@@ -62,7 +62,7 @@ SpriteAnimator.prototype = {
         sprite.artist.cells = this.cells;
         sprite.artist.cellIndex = 0;
 
-        setTimeout(function() {
+        setTimeout(function () {
             sprite.artist.cells = originalCells;
             sprite.artist.cellIndex = originalIndex;
 

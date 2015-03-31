@@ -42,7 +42,7 @@ var CamelGame = function () {
         this.GRAVITY_FORCE = 9.81,
         this.PIXELS_PER_METER = this.canvas.width / 10; // 10 meters, randomly selected width
 
-        this.OASIS_CELLS_HEIGHT = 90,
+    this.OASIS_CELLS_HEIGHT = 90,
         this.OASIS_CELLS_WIDTH = 90,
 
         this.TOURIST_CELLS_HEIGHT = 130,
@@ -314,8 +314,7 @@ var CamelGame = function () {
             },
 
             jumpIsOver: function (sprite) {
-                return ! sprite.ascendAnimationTimer.isRunning() &&
-                    ! sprite.descendAnimationTimer.isRunning();
+                return !sprite.ascendAnimationTimer.isRunning() && !sprite.descendAnimationTimer.isRunning();
             },
 
             // Ascent...............................................................
@@ -326,12 +325,12 @@ var CamelGame = function () {
 
             ascend: function (sprite) {
                 var elapsed = sprite.ascendAnimationTimer.getElapsedTime(),
-                    deltaH  = elapsed / (sprite.JUMP_DURATION/2) * sprite.JUMP_HEIGHT;
+                    deltaH = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
                 sprite.top = sprite.verticalLaunchPosition - deltaH;
             },
 
             isDoneAscending: function (sprite) {
-                return sprite.ascendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION/2;
+                return sprite.ascendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION / 2;
             },
 
             finishAscent: function (sprite) {
@@ -348,32 +347,24 @@ var CamelGame = function () {
 
             descend: function (sprite, verticalVelocity, fps) {
                 var elapsed = sprite.descendAnimationTimer.getElapsedTime(),
-                    deltaH  = elapsed / (sprite.JUMP_DURATION/2) * sprite.JUMP_HEIGHT;
+                    deltaH = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
 
                 sprite.top = sprite.jumpApex + deltaH;
             },
 
             isDoneDescending: function (sprite) {
-                return sprite.descendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION/2;
+                return sprite.descendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION / 2;
             },
 
             finishDescent: function (sprite) {
                 sprite.stopJumping();
 
-          /*      if (CamelGame.isOverPlatform(sprite) !== -1) {
-                    sprite.top = sprite.verticalLaunchPosition;
-                }
-                else {
-                    sprite.fall(CamelGame.GRAVITY_FORCE *
-                    (sprite.descendAnimationTimer.getElapsedTime()/1000) *
-                    CamelGame.PIXELS_PER_METER);
-                }
-          */  },
+            },
 
             // Execute..............................................................
 
-            execute: function(sprite, time, fps) {
-                if ( ! sprite.jumping || sprite.exploding) {
+            execute: function (sprite, time, fps) {
+                if (!sprite.jumping || sprite.exploding) {
                     return;
                 }
 
@@ -383,12 +374,20 @@ var CamelGame = function () {
                 }
 
                 if (this.isAscending(sprite)) {
-                    if ( ! this.isDoneAscending(sprite)) { this.ascend(sprite); }
-                    else                                 { this.finishAscent(sprite); }
+                    if (!this.isDoneAscending(sprite)) {
+                        this.ascend(sprite);
+                    }
+                    else {
+                        this.finishAscent(sprite);
+                    }
                 }
                 else if (this.isDescending(sprite)) {
-                    if ( ! this.isDoneDescending(sprite)) { this.descend(sprite); }
-                    else                                  { this.finishDescent(sprite); }
+                    if (!this.isDoneDescending(sprite)) {
+                        this.descend(sprite);
+                    }
+                    else {
+                        this.finishDescent(sprite);
+                    }
                 }
             }
         },
@@ -415,7 +414,7 @@ var CamelGame = function () {
                 var fallingElapsedTime;
 
                 sprite.velocityY = sprite.initialVelocityY + CamelGame.GRAVITY_FORCE *
-                (sprite.fallAnimationTimer.getElapsedTime()/1000) *
+                (sprite.fallAnimationTimer.getElapsedTime() / 1000) *
                 CamelGame.PIXELS_PER_METER;
             },
 
@@ -483,7 +482,8 @@ var CamelGame = function () {
 
                 for (var i = 0; i < CamelGame.sprites.length; ++i) {
                     otherSprite = CamelGame.sprites[i];
-
+                    if (CamelGame.runner.jumping == true)
+                        return;
                     if (this.isCandidateForCollision(sprite, otherSprite)) {
                         if (this.didCollide(sprite, otherSprite, context)) {
                             this.processCollision(sprite, otherSprite);
@@ -780,7 +780,7 @@ CamelGame.prototype = {
 
     equipRunnerForJumping: function () {
         this.runner.JUMP_DURATION = 1000; // milliseconds
-        this.runner.JUMP_HEIGHT = 200;
+        this.runner.JUMP_HEIGHT = 150;
 
         this.runner.jumping = false;
 
@@ -1112,49 +1112,49 @@ window.onkeydown = function (e) {
 }
 
 window.onresize = function (e) { // change canvas size when window resize
-        CamelGame.canvas.width = window.innerWidth;
-        CamelGame.canvas.height = window.innerHeight;
+    CamelGame.canvas.width = window.innerWidth;
+    CamelGame.canvas.height = window.innerHeight;
+}
+
+window.onblur = function (e) {  // pause if unpaused
+    CamelGame.windowHasFocus = false;
+
+    if (!CamelGame.paused) {
+        CamelGame.togglePaused();
     }
+};
 
-    window.onblur = function (e) {  // pause if unpaused
-        CamelGame.windowHasFocus = false;
+window.onfocus = function (e) {  // unpause if paused
+    var originalFont = CamelGame.toast.style.fontSize;
 
-        if (!CamelGame.paused) {
-            CamelGame.togglePaused();
-        }
-    };
+    CamelGame.windowHasFocus = true;
 
-    window.onfocus = function (e) {  // unpause if paused
-        var originalFont = CamelGame.toast.style.fontSize;
+    if (CamelGame.paused) {
+        CamelGame.toast.style.font = '128px fantasy';
 
-        CamelGame.windowHasFocus = true;
+        CamelGame.splashToast('3', 500); // Display 3 for one half second
 
-        if (CamelGame.paused) {
-            CamelGame.toast.style.font = '128px fantasy';
-
-            CamelGame.splashToast('3', 500); // Display 3 for one half second
+        setTimeout(function (e) {
+            CamelGame.splashToast('2', 500); // Display 2 for one half second
 
             setTimeout(function (e) {
-                CamelGame.splashToast('2', 500); // Display 2 for one half second
+                CamelGame.splashToast('1', 500); // Display 1 for one half second
 
                 setTimeout(function (e) {
-                    CamelGame.splashToast('1', 500); // Display 1 for one half second
+                    if (CamelGame.windowHasFocus) {
+                        CamelGame.togglePaused();
+                    }
 
-                    setTimeout(function (e) {
-                        if (CamelGame.windowHasFocus) {
-                            CamelGame.togglePaused();
-                        }
-
-                        setTimeout(function (e) { // Wait for '1' to disappear
-                            CamelGame.toast.style.fontSize = originalFont;
-                        }, 2000);
-                    }, 1000);
+                    setTimeout(function (e) { // Wait for '1' to disappear
+                        CamelGame.toast.style.fontSize = originalFont;
+                    }, 2000);
                 }, 1000);
             }, 1000);
-        }
-    };
+        }, 1000);
+    }
+};
 
 // Launch game.........................................................
 
-    var CamelGame = new CamelGame();
-    CamelGame.start();
+var CamelGame = new CamelGame();
+CamelGame.start();
