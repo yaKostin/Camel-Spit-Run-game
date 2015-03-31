@@ -1083,6 +1083,12 @@ document.getElementById('game-canvas').addEventListener("touchstart", function (
     }
 }, false);
 
+//touch on jump
+document.getElementById('jumpButton').addEventListener("touchstart", function (e) {
+    var touch = e.touches[0];
+   CamelGame.runner.jump();
+}, false);
+
 window.onkeydown = function (e) {
     var key = e.keyCode;
 
