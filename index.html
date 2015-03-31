@@ -1,42 +1,45 @@
 <!DOCTYPE html>
-	<head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1, user-scalable=0">
-	   <title>CAMEL: Spit & Run</title>
-      <link rel='stylesheet' href='css/normalize.css'/>
-      <link rel='stylesheet' href='game.css'/>
-   </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>CAMEL: Spit & Run</title>
+    <link rel='stylesheet' href='css/normalize.css'/>
+    <link rel='stylesheet' href='game.css'/>
+</head>
 
-   <body>
-      <div id='wrapper' class="start_wr">
-         <div>
-            <div class="game_logo">
-               <div class="top">Camel</div>
-               <div class="bottom">spit & run</div>
+<body>
+<div id='wrapper' class="start_wr">
+    <div>
+        <div class="game_logo">
+            <div class="top">Camel</div>
+            <div class="bottom">spit & run</div>
+        </div>
+        <div class="enter_name_wr">
+            <div class="name">Как тебя зовут?</div>
+            <input type="text" class="name_input">
+            <button class="menu_btn" id="login_btn">Войти</button>
+        </div>
+        <div class="game_menu">
+            <button class="menu_btn" id="start_btn">Старт</button>
+            <button class="menu_btn" id="settings_btn">Настройки <span class="arrows"></span></button>
+            <div class="settings_wr">
+                <div>
+                    Музыка
+                    <button class="sound_btn" id="music_btn"></button>
+                </div>
+                <div>
+                    Звуки
+                    <button class="sound_btn" id="sounds_btn"></button>
+                </div>
             </div>
-            <div class="enter_name_wr">
-               <div class="name">Как тебя зовут?</div>
-                <input type="text" class="name_input">
-                <button class="menu_btn" id="login_btn">Войти</button>
-            </div>
-            <div class="game_menu">
-               <button class="menu_btn" id="start_btn">Старт</button>
-               <button class="menu_btn" id="settings_btn">Настройки <span class="arrows"></span></button>
-               <div class="settings_wr">
-                 <div>
-                   Музыка <button class="sound_btn" id="music_btn"></button>
-                 </div>
-                 <div>
-                   Звуки <button class="sound_btn" id="sounds_btn"></button>
-                 </div>
-              </div>
-               <button class="menu_btn" id="statistics_btn">Статистика</button>
-               <button class="menu_btn" id="exit_btn">Выход</button>
-            </div>
-         </div>
-      </div>
+            <button class="menu_btn" id="statistics_btn">Статистика</button>
+            <button class="menu_btn" id="exit_btn">Выход</button>
+        </div>
+    </div>
+</div>
 
-      <script src='js/jquery-1.11.2.min.js'></script>
-      <script src='js/start.js'></script>
-  </body>
+<script src='js/jquery-1.11.2.min.js'></script>
+<script src='js/start.js'></script>
+</body>
 </html>
