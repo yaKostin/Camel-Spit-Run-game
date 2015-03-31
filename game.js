@@ -27,7 +27,7 @@ var CamelGame = function () {
 
         this.PAUSED_CHECK_INTERVAL = 200,
 
-        this.CAMEL_CELLS_HEIGHT = 90,
+        this.CAMEL_CELLS_HEIGHT = 60,
 
         this.STARTING_BACKGROUND_VELOCITY = 0,
 
@@ -64,8 +64,8 @@ var CamelGame = function () {
         this.PYRAMID_WIDTH = 90,
         this.PYRAMID_HEIGHT = 90,
 
-        this.CAMEL_WIDTH = 120,
-        this.CAMEL_HEIGHT = 90,
+        this.CAMEL_WIDTH = 80,
+        this.CAMEL_HEIGHT = 60,
 
         this.BUSH_WIDTH = 90,
         this.BUSH_HEIGHT = 90,
@@ -73,6 +73,8 @@ var CamelGame = function () {
         this.PALM_WIDTH = 80,
         this.PALM_HEIGHT = 130,
 
+        this.SPIT_WIDTH=50,
+        this.SPIT_HEIGHT=50,
         // Paused............................................................
 
         this.paused = false,
@@ -138,8 +140,12 @@ var CamelGame = function () {
         {left: 1280, top: 0, width: 117, height: 90},  //8
     ],
 
+        this.spitCells = [
+            {left:950, top:298, width: 170, height:100}
+        ],
+
         this.oasisCells = [
-            {left: 192, top: 294, width: 149, height: 87, width: 148, height: 90},
+            {left: 192, top: 294, width: 148, height: 90},
         ],
 
         this.touristCells = [
@@ -669,7 +675,7 @@ CamelGame.prototype = {
             return 60;
         }
 
-        fps = 5000 / (now - this.lastAnimationFrameTime);
+        fps = 1000 / (now - this.lastAnimationFrameTime);
         this.lastAnimationFrameTime = now;
 
         if (now - this.lastFpsUpdateTime > 1000) {
