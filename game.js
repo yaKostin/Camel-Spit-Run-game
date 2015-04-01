@@ -73,8 +73,8 @@ var CamelGame = function () {
         this.PALM_WIDTH = 80,
         this.PALM_HEIGHT = 130,
 
-        this.SPIT_WIDTH=50,
-        this.SPIT_HEIGHT=50,
+        this.SPIT_WIDTH = 50,
+        this.SPIT_HEIGHT = 50,
         // Paused............................................................
 
         this.paused = false,
@@ -125,6 +125,8 @@ var CamelGame = function () {
 
         this.bgVelocity = this.STARTING_BACKGROUND_VELOCITY;
 
+
+    this.is_shooting = true;
 // Sprite artists...................................................
 
     this.camelCells = [
@@ -141,7 +143,7 @@ var CamelGame = function () {
     ],
 
         this.spitCells = [
-            {left:950, top:298, width: 170, height:100}
+            {left: 950, top: 298, width: 170, height: 100}
         ],
 
         this.oasisCells = [
@@ -196,6 +198,7 @@ var CamelGame = function () {
         ],
 
         this.runnerArtist = new SpriteSheetArtist(this.spritesheet, this.camelCells);
+    this.spitArtist = new SpriteSheetArtist(this.spritesheet, this.spitCells);
 
     // Sprite behaviors.................................................
 
@@ -287,116 +290,133 @@ var CamelGame = function () {
             }
         },
 
-        this.snailShootBehavior = { // sprite is the snail
+        this.ShootBehavior = { // sprite is the snail
             execute: function (sprite, time, fps) {
-                var bomb = sprite.bomb;
+                var spit = sprite.spit;
 
-                if (!bomb.visible && sprite.artist.cellIndex === 2) {
-                    bomb.left = sprite.left;
-                    bomb.visible = true;
-                }
-            }
-        },
-
-        //jumping
-
-        this.jumpBehavior = {
-            pause: function (sprite) {
-                if (sprite.ascendAnimationTimer.isRunning()) {
-                    sprite.ascendAnimationTimer.pause();
-                }
-                else if (!sprite.descendAnimationTimer.isRunning()) {
-                    sprite.descendAnimationTimer.pause();
-                }
-            },
-
-            unpause: function (sprite) {
-                if (sprite.ascendAnimationTimer.isRunning()) {
-                    sprite.ascendAnimationTimer.unpause();
-                }
-                else if (sprite.descendAnimationTimer.isRunning()) {
-                    sprite.descendAnimationTimer.unpause();
-                }
-            },
-
-            jumpIsOver: function (sprite) {
-                return !sprite.ascendAnimationTimer.isRunning() && !sprite.descendAnimationTimer.isRunning();
-            },
-
-            // Ascent...............................................................
-
-            isAscending: function (sprite) {
-                return sprite.ascendAnimationTimer.isRunning();
-            },
-
-            ascend: function (sprite) {
-                var elapsed = sprite.ascendAnimationTimer.getElapsedTime(),
-                    deltaH = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
-                sprite.top = sprite.verticalLaunchPosition - deltaH;
-            },
-
-            isDoneAscending: function (sprite) {
-                return sprite.ascendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION / 2;
-            },
-
-            finishAscent: function (sprite) {
-                sprite.jumpApex = sprite.top;
-                sprite.ascendAnimationTimer.stop();
-                sprite.descendAnimationTimer.start();
-            },
-
-            // Descents.............................................................
-
-            isDescending: function (sprite) {
-                return sprite.descendAnimationTimer.isRunning();
-            },
-
-            descend: function (sprite, verticalVelocity, fps) {
-                var elapsed = sprite.descendAnimationTimer.getElapsedTime(),
-                    deltaH = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
-
-                sprite.top = sprite.jumpApex + deltaH;
-            },
-
-            isDoneDescending: function (sprite) {
-                return sprite.descendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION / 2;
-            },
-
-            finishDescent: function (sprite) {
-                sprite.stopJumping();
-
-            },
-
-            // Execute..............................................................
-
-            execute: function (sprite, time, fps) {
-                if (!sprite.jumping || sprite.exploding) {
+                if (!CamelGame.spriteInView(sprite)) {
                     return;
                 }
 
-                if (this.jumpIsOver(sprite)) {
-                    sprite.jumping = false;
-                    return;
-                }
-
-                if (this.isAscending(sprite)) {
-                    if (!this.isDoneAscending(sprite)) {
-                        this.ascend(sprite);
-                    }
-                    else {
-                        this.finishAscent(sprite);
-                    }
-                }
-                else if (this.isDescending(sprite)) {
-                    if (!this.isDoneDescending(sprite)) {
-                        this.descend(sprite);
-                    }
-                    else {
-                        this.finishDescent(sprite);
-                    }
+                if (!spit.visible && CamelGame.is_shooting ) {
+                    //CamelGame.is_shooting=false;
+                    spit.left = sprite.left;
+                    spit.visible = true;
                 }
             }
+        };
+
+    this.SpitMoveBehavior = {
+        execute: function (sprite, time, fps) {  // sprite is the bomb
+            if (sprite.visible && CamelGame.spriteInView(sprite)) {
+                sprite.left += 450 / fps;    //speed of spit
+            }
+
+            if (!CamelGame.spriteInView(sprite)) {
+                sprite.visible = false;
+            }
+        }
+    };
+
+    //jumping
+
+    this.jumpBehavior = {
+        pause: function (sprite) {
+            if (sprite.ascendAnimationTimer.isRunning()) {
+                sprite.ascendAnimationTimer.pause();
+            }
+            else if (!sprite.descendAnimationTimer.isRunning()) {
+                sprite.descendAnimationTimer.pause();
+            }
         },
+
+        unpause: function (sprite) {
+            if (sprite.ascendAnimationTimer.isRunning()) {
+                sprite.ascendAnimationTimer.unpause();
+            }
+            else if (sprite.descendAnimationTimer.isRunning()) {
+                sprite.descendAnimationTimer.unpause();
+            }
+        },
+
+        jumpIsOver: function (sprite) {
+            return !sprite.ascendAnimationTimer.isRunning() && !sprite.descendAnimationTimer.isRunning();
+        },
+
+        // Ascent...............................................................
+
+        isAscending: function (sprite) {
+            return sprite.ascendAnimationTimer.isRunning();
+        },
+
+        ascend: function (sprite) {
+            var elapsed = sprite.ascendAnimationTimer.getElapsedTime(),
+                deltaH = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
+            sprite.top = sprite.verticalLaunchPosition - deltaH;
+        },
+
+        isDoneAscending: function (sprite) {
+            return sprite.ascendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION / 2;
+        },
+
+        finishAscent: function (sprite) {
+            sprite.jumpApex = sprite.top;
+            sprite.ascendAnimationTimer.stop();
+            sprite.descendAnimationTimer.start();
+        },
+
+        // Descents.............................................................
+
+        isDescending: function (sprite) {
+            return sprite.descendAnimationTimer.isRunning();
+        },
+
+        descend: function (sprite, verticalVelocity, fps) {
+            var elapsed = sprite.descendAnimationTimer.getElapsedTime(),
+                deltaH = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
+
+            sprite.top = sprite.jumpApex + deltaH;
+        },
+
+        isDoneDescending: function (sprite) {
+            return sprite.descendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION / 2;
+        },
+
+        finishDescent: function (sprite) {
+            sprite.stopJumping();
+
+        },
+
+        // Execute..............................................................
+
+        execute: function (sprite, time, fps) {
+            if (!sprite.jumping || sprite.exploding) {
+                return;
+            }
+
+            if (this.jumpIsOver(sprite)) {
+                sprite.jumping = false;
+                return;
+            }
+
+            if (this.isAscending(sprite)) {
+                if (!this.isDoneAscending(sprite)) {
+                    this.ascend(sprite);
+                }
+                else {
+                    this.finishAscent(sprite);
+                }
+            }
+            else if (this.isDescending(sprite)) {
+                if (!this.isDoneDescending(sprite)) {
+                    this.descend(sprite);
+                }
+                else {
+                    this.finishDescent(sprite);
+                }
+            }
+        }
+    },
 
         // Runner's fall behavior..................................................
 
@@ -580,6 +600,7 @@ var CamelGame = function () {
                 this.upBehavior,
                 this.downBehavior,
                 this.jumpBehavior,
+                this.ShootBehavior,
                 this.collideBehavior
             ]);
 
@@ -589,14 +610,6 @@ var CamelGame = function () {
     // arrays to the sprites array)
 
     this.sprites = [this.runner];
-
-    /* this.explosionAnimator = new SpriteAnimator(
-     this.explosionCells,          // Animation cells
-     this.EXPLOSION_DURATION,      // Duration of the explosion
-     function (sprite, animator) { // Callback after animation
-     sprite.exploding = false;
-     }
-     );*/
 };
 
 
@@ -748,6 +761,22 @@ CamelGame.prototype = {
         this.runner.jumping = false;
         this.runner.falling = false;
 
+        //spits
+        this.runner.spit = new Sprite('spit',
+            this.spitArtist,
+            [this.SpitMoveBehavior]);
+
+        this.runner.spit.width = CamelGame.SPIT_WIDTH;
+        this.runner.spit.height = CamelGame.SPIT_HEIGHT;
+
+        this.runner.spit.top = this.runner.top + this.runner.spit.height / 2;
+        this.runner.spit.left = this.runner.left + this.runner.width + 5 + this.runner.spit.width / 2;
+        this.runner.spit.visible = false;
+
+        this.runner.spit.runner = this.runner;  // runner spits maintain a reference to their runner
+
+        this.sprites.push(this.runner.spit);
+        //spits end
         this.runner.up = function () {
             // this method is essentially a switch that turns
             // on the runner's jumping behavior
@@ -1092,7 +1121,7 @@ document.getElementById('game-canvas').addEventListener("touchstart", function (
 //touch on jump
 document.getElementById('jumpButton').addEventListener("touchstart", function (e) {
     var touch = e.touches[0];
-   CamelGame.runner.jump();
+    CamelGame.runner.jump();
 }, false);
 
 window.onkeydown = function (e) {
