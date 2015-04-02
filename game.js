@@ -126,7 +126,7 @@ var CamelGame = function () {
     this.bgVelocity = this.STARTING_BACKGROUND_VELOCITY;
 
 
-    this.is_shooting = true;
+    this.is_shooting = false;
 // Sprite artists...................................................
 
     this.camelCells = [
@@ -298,9 +298,10 @@ var CamelGame = function () {
                 return;
             }
 
-            if (!spit.visible && CamelGame.is_shooting ) {
+            if (!spit.visible && CamelGame.runner.shooting ) {
                 //CamelGame.is_shooting=false;
-                spit.left = sprite.left;
+                spit.top= sprite.top;
+                spit.left = sprite.left+CamelGame.spriteOffset;
                 spit.visible = true;
             }
         }
@@ -309,11 +310,12 @@ var CamelGame = function () {
     this.SpitMoveBehavior = {
         execute: function (sprite, time, fps) {  // sprite is the bomb
             if (sprite.visible && CamelGame.spriteInView(sprite)) {
-                sprite.left += 450 / fps;    //speed of spit
+                sprite.left += 1050/fps;    //speed of spit
             }
 
             if (!CamelGame.spriteInView(sprite)) {
                 sprite.visible = false;
+                CamelGame.runner.shooting=false;
             }
         }
     };
@@ -688,7 +690,7 @@ CamelGame.prototype = {
             return 60;
         }
 
-        fps = 1000 / (now - this.lastAnimationFrameTime);
+        fps = 2000 / (now - this.lastAnimationFrameTime);
         this.lastAnimationFrameTime = now;
 
         if (now - this.lastFpsUpdateTime > 1000) {
@@ -760,6 +762,7 @@ CamelGame.prototype = {
         this.runner.changing_track_down = false;
         this.runner.jumping = false;
         this.runner.falling = false;
+        this.runner.shooting = false;
 
         //spits
         this.runner.spit = new Sprite('spit',
@@ -842,8 +845,12 @@ CamelGame.prototype = {
             this.jumping = true;
             this.verticalLaunchPosition = this.top;
             this.ascendAnimationTimer.start();
+        };
 
-
+        this.runner.shoot = function () {
+            if (this.shooting) // 'this' is the runner
+                return;
+            this.shooting = true;
         };
     },
     // Toast................................................................
@@ -972,7 +979,7 @@ CamelGame.prototype = {
     },
 
     spriteInView: function (sprite) {
-        return sprite === this.runner || sprite.type == 'spit' ||// runner is always visible
+        return sprite === this.runner  ||// runner is always visible
             (sprite.left + sprite.width > this.spriteOffset &&
             sprite.left < this.spriteOffset + this.canvas.width);
     },
@@ -1124,6 +1131,15 @@ document.getElementById('jumpButton').addEventListener("touchstart", function (e
     CamelGame.runner.jump();
 }, false);
 
+//touch on spit
+document.getElementById('spitButton').addEventListener("touchstart", function (e) {
+    var touch = e.touches[0];
+    if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
+        CamelGame.runner.shoot();
+    }
+}, false);
+
+
 window.onkeydown = function (e) {
     var key = e.keyCode;
 
@@ -1148,6 +1164,11 @@ window.onkeydown = function (e) {
     else if (key === 32) { // 'space'
         if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
             CamelGame.runner.jump();
+        }
+    }
+    else if (key === 84) { // 't'
+        if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
+            CamelGame.runner.shoot();
         }
     }
 }
