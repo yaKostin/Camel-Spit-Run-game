@@ -2,129 +2,131 @@
 
 var CamelGame = function () {
     this.canvas = document.getElementById('game-canvas'),
-        this.canvas.width = window.innerWidth;
+    this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
     this.context = this.canvas.getContext('2d'),
 
-        // HTML elements........................................................
+    // HTML elements........................................................
 
-        this.fpsElement = document.getElementById('fps'),
-        this.toast = document.getElementById('toast'),
-        this.scoreElement = document.getElementById('score'),
-        this.healthProgressBar = new ProgressBar('#health'),
-        this.waterProgressBar = new ProgressBar('#water'),
+    this.fpsElement = document.getElementById('fps'),
+    this.toast = document.getElementById('toast'),
+    this.scoreElement = document.getElementById('score'),
+    this.healthProgressBar = new ProgressBar('#health'),
+    this.waterProgressBar = new ProgressBar('#water'),
 
-        // Constants............................................................
+    // Constants............................................................
 
-        this.LEFT = 1,
-        this.RIGHT = 2,
-        this.STATIONARY = 3,
+    this.LEFT = 1,
+    this.RIGHT = 2,
+    this.STATIONARY = 3,
 
-        // Constants are listed in alphabetical order from here on out
+    // Constants are listed in alphabetical order from here on out
 
-        this.BACKGROUND_VELOCITY = 100,
-        this.DEFAULT_TOAST_TIME = 1000,
+    this.BACKGROUND_VELOCITY = 100,
+    this.DEFAULT_TOAST_TIME = 1000,
 
-        this.PAUSED_CHECK_INTERVAL = 200,
+    this.PAUSED_CHECK_INTERVAL = 200,
 
-        this.CAMEL_CELLS_HEIGHT = 60,
+    this.CAMEL_CELLS_HEIGHT = 60,
 
-        this.STARTING_BACKGROUND_VELOCITY = 0,
+    this.STARTING_BACKGROUND_VELOCITY = 0,
 
-        this.STARTING_BACKGROUND_OFFSET = 0,
-        this.INITIAL_BACKGROUND_OFFSET = 0,
+    this.STARTING_BACKGROUND_OFFSET = 0,
+    this.INITIAL_BACKGROUND_OFFSET = 0,
 
-        this.STARTING_RUNNER_LEFT = 50,
-        this.STARTING_PAGEFLIP_INTERVAL = -1,
-        this.STARTING_RUNNER_TRACK = 1,
-        this.STARTING_RUNNER_VELOCITY = 0,
+    this.STARTING_RUNNER_LEFT = 50,
+    this.STARTING_PAGEFLIP_INTERVAL = -1,
+    this.STARTING_RUNNER_TRACK = 1,
+    this.STARTING_RUNNER_VELOCITY = 0,
 
-        this.GRAVITY_FORCE = 9.81,
-        this.PIXELS_PER_METER = this.canvas.width / 10; // 10 meters, randomly selected width
+    this.GRAVITY_FORCE = 9.81,
+    this.PIXELS_PER_METER = this.canvas.width / 10; // 10 meters, randomly selected width
 
     this.OASIS_CELLS_HEIGHT = 90,
-        this.OASIS_CELLS_WIDTH = 90,
+    this.OASIS_CELLS_WIDTH = 90,
 
-        this.TOURIST_CELLS_HEIGHT = 130,
-        this.TOURIST_CELLS_WIDTH = 90,
+    this.TOURIST_CELLS_HEIGHT = 130,
+    this.TOURIST_CELLS_WIDTH = 90,
 
-        this.BUSH_CELLS_WIDTH = 160,
-        this.BUSH_CELLS_HEIGHT = 102,
+    this.BUSH_CELLS_WIDTH = 160,
+    this.BUSH_CELLS_HEIGHT = 102,
 
-        this.PALM_CELLS_WIDTH = 143,
-        this.PALM_CELLS_HEIGHT = 231,
+    this.PALM_CELLS_WIDTH = 143,
+    this.PALM_CELLS_HEIGHT = 231,
 
-        //
-        this.OASIS_WIDTH = 100,
-        this.OASIS_HEIGHT = 80,
+    //
+    this.OASIS_WIDTH = 100,
+    this.OASIS_HEIGHT = 80,
 
-        this.TOURIST_WIDTH = 80,
-        this.TOURIST_HEIGHT = 100,
+    this.TOURIST_WIDTH = 80,
+    this.TOURIST_HEIGHT = 100,
 
-        this.PYRAMID_WIDTH = 90,
-        this.PYRAMID_HEIGHT = 90,
+    this.PYRAMID_WIDTH = 90,
+    this.PYRAMID_HEIGHT = 90,
 
-        this.CAMEL_WIDTH = 80,
-        this.CAMEL_HEIGHT = 60,
+    this.CAMEL_WIDTH = 80,
+    this.CAMEL_HEIGHT = 60,
 
-        this.BUSH_WIDTH = 90,
-        this.BUSH_HEIGHT = 90,
+    this.BUSH_WIDTH = 90,
+    this.BUSH_HEIGHT = 90,
 
-        this.PALM_WIDTH = 80,
-        this.PALM_HEIGHT = 130,
+    this.PALM_WIDTH = 80,
+    this.PALM_HEIGHT = 130,
 
-        this.SPIT_WIDTH=50,
-        this.SPIT_HEIGHT=50,
-        // Paused............................................................
+    this.SPIT_WIDTH = 50,
+    this.SPIT_HEIGHT = 50,
+    // Paused............................................................
 
-        this.paused = false,
-        this.pauseStartTime = 0,
-        this.totalTimePaused = 0,
+    this.paused = false,
+    this.pauseStartTime = 0,
+    this.totalTimePaused = 0,
 
-        this.windowHasFocus = true,
+    this.windowHasFocus = true,
 
-        // Track baselines...................................................
+    // Track baselines...................................................
 
-        this.TRACK_1_BASELINE = this.canvas.height,
-        this.TRACK_2_BASELINE = this.canvas.height / 4 * 3,
-        this.TRACK_3_BASELINE = this.canvas.height / 4 * 2,
+    this.TRACK_1_BASELINE = this.canvas.height,
+    this.TRACK_2_BASELINE = this.canvas.height / 4 * 3,
+    this.TRACK_3_BASELINE = this.canvas.height / 4 * 2,
 
-        // Fps indicator.....................................................
+    // Fps indicator.....................................................
 
-        this.fpsToast = document.getElementById('fps'),
+    this.fpsToast = document.getElementById('fps'),
 
-        // Images............................................................
+    // Images............................................................
 
-        this.background = new Image(),
-        this.runnerImage = new Image(),
-        this.spritesheet = new Image(),
-        // Time..............................................................
+    this.background = new Image(),
+    this.runnerImage = new Image(),
+    this.spritesheet = new Image(),
+    // Time..............................................................
 
-        this.lastAnimationFrameTime = 0,
-        this.lastFpsUpdateTime = 0,
-        this.fps = 60,
+    this.lastAnimationFrameTime = 0,
+    this.lastFpsUpdateTime = 0,
+    this.fps = 60,
 
-        // Runner track......................................................
+    // Runner track......................................................
 
-        this.runnerTrack = this.STARTING_RUNNER_TRACK,
+    this.runnerTrack = this.STARTING_RUNNER_TRACK,
 
-        // Pageflip timing for runner........................................
+    // Pageflip timing for runner........................................
 
-        this.runnerPageflipInterval = this.STARTING_PAGEFLIP_INTERVAL,
+    this.runnerPageflipInterval = this.STARTING_PAGEFLIP_INTERVAL,
 
-        // Scrolling direction...............................................
+    // Scrolling direction...............................................
 
-        this.scrollingDirection = this.STATIONARY,
+    this.scrollingDirection = this.STATIONARY,
 
-        // Translation offsets...............................................
+    // Translation offsets...............................................
 
-        this.backgroundOffset = this.STARTING_BACKGROUND_OFFSET,
-        this.spriteOffset = this.INITIAL_BACKGROUND_OFFSET,
+    this.backgroundOffset = this.STARTING_BACKGROUND_OFFSET,
+    this.spriteOffset = this.INITIAL_BACKGROUND_OFFSET,
 
-        // Velocities........................................................
+    // Velocities........................................................
 
-        this.bgVelocity = this.STARTING_BACKGROUND_VELOCITY;
+    this.bgVelocity = this.STARTING_BACKGROUND_VELOCITY;
 
+
+    this.is_shooting = false;
 // Sprite artists...................................................
 
     this.camelCells = [
@@ -140,62 +142,63 @@ var CamelGame = function () {
         {left: 1280, top: 0, width: 117, height: 90},  //8
     ],
 
-        this.spitCells = [
-            {left:950, top:298, width: 170, height:100}
-        ],
+    this.spitCells = [
+        {left: 950, top: 298, width: 170, height: 100}
+    ],
 
-        this.oasisCells = [
-            {left: 192, top: 294, width: 148, height: 90},
-        ],
+    this.oasisCells = [
+        {left: 192, top: 294, width: 148, height: 90},
+    ],
 
-        this.touristCells = [
-            {left: 813, top: 171, width: 153, height: 209},
-        ],
+    this.touristCells = [
+        {left: 813, top: 171, width: 153, height: 209},
+    ],
 
-        this.pyramidCells = [
-            {left: 582, top: 190, width: 197, height: 195},
-        ],
+    this.pyramidCells = [
+        {left: 582, top: 190, width: 197, height: 195},
+    ],
 
-        this.bushCells = [
-            {left: 0, top: 298, width: 160, height: 102},
-        ],
+    this.bushCells = [
+        {left: 0, top: 298, width: 160, height: 102},
+    ],
 
-        this.palmCells = [
-            {left: 414, top: 153, width: this.PALM_CELLS_WIDTH, height: this.PALM_CELLS_HEIGHT},
-        ],
+    this.palmCells = [
+        {left: 414, top: 153, width: this.PALM_CELLS_WIDTH, height: this.PALM_CELLS_HEIGHT},
+    ],
 
-        //
+    //
 
-        this.oasisData = [
-            {left: 600, top: this.TRACK_1_BASELINE - this.OASIS_HEIGHT},
-            {left: 1200, top: this.TRACK_2_BASELINE - this.OASIS_HEIGHT},
-            {left: 2450, top: this.TRACK_3_BASELINE - this.OASIS_HEIGHT},
-        ],
+    this.oasisData = [
+        {left: 600, top: this.TRACK_1_BASELINE - this.OASIS_HEIGHT},
+        {left: 1200, top: this.TRACK_2_BASELINE - this.OASIS_HEIGHT},
+        {left: 2450, top: this.TRACK_3_BASELINE - this.OASIS_HEIGHT},
+    ],
 
-        this.touristData = [
-            {left: 600, top: this.TRACK_1_BASELINE - this.TOURIST_HEIGHT},
-            {left: 1600, top: this.TRACK_2_BASELINE - this.TOURIST_HEIGHT},
-            {left: 2600, top: this.TRACK_3_BASELINE - this.TOURIST_HEIGHT},
-        ],
+    this.touristData = [
+        {left: 600, top: this.TRACK_1_BASELINE - this.TOURIST_HEIGHT},
+        {left: 1600, top: this.TRACK_2_BASELINE - this.TOURIST_HEIGHT},
+        {left: 2600, top: this.TRACK_3_BASELINE - this.TOURIST_HEIGHT},
+    ],
 
-        this.pyramidData = [
-            {left: 1400, top: this.TRACK_1_BASELINE - this.OASIS_HEIGHT},
-            {left: 2200, top: this.TRACK_1_BASELINE - this.OASIS_HEIGHT},
-        ],
+    this.pyramidData = [
+        {left: 1400, top: this.TRACK_1_BASELINE - this.OASIS_HEIGHT},
+        {left: 2200, top: this.TRACK_1_BASELINE - this.OASIS_HEIGHT},
+    ],
 
-        this.bushData = [
-            {left: 954, top: this.TRACK_1_BASELINE - this.BUSH_HEIGHT},
-            {left: 1754, top: this.TRACK_3_BASELINE - this.BUSH_HEIGHT},
-            {left: 3100, top: this.TRACK_2_BASELINE - this.BUSH_HEIGHT},
-        ],
+    this.bushData = [
+        {left: 954, top: this.TRACK_1_BASELINE - this.BUSH_HEIGHT},
+        {left: 1754, top: this.TRACK_3_BASELINE - this.BUSH_HEIGHT},
+        {left: 3100, top: this.TRACK_2_BASELINE - this.BUSH_HEIGHT},
+    ],
 
-        this.palmData = [
-            {left: 1340, top: this.TRACK_3_BASELINE - this.PALM_HEIGHT},
-            {left: 2301, top: this.TRACK_2_BASELINE - this.PALM_HEIGHT},
-            {left: 3304, top: this.TRACK_3_BASELINE - this.PALM_HEIGHT},
-        ],
+    this.palmData = [
+        {left: 1340, top: this.TRACK_3_BASELINE - this.PALM_HEIGHT},
+        {left: 2301, top: this.TRACK_2_BASELINE - this.PALM_HEIGHT},
+        {left: 3304, top: this.TRACK_3_BASELINE - this.PALM_HEIGHT},
+    ],
 
-        this.runnerArtist = new SpriteSheetArtist(this.spritesheet, this.camelCells);
+    this.runnerArtist = new SpriteSheetArtist(this.spritesheet, this.camelCells);
+    this.spitArtist = new SpriteSheetArtist(this.spritesheet, this.spitCells);
 
     // Sprite behaviors.................................................
 
@@ -213,8 +216,8 @@ var CamelGame = function () {
 
         execute: function (sprite, time, fps) {
             // Realize that this is a method in an object (runBehavior), that resides
-            // in another object (snailBait), so the 'this' reference in this method
-            // refers to runBehavior, not snailBait.
+            // in another object (CamelGame), so the 'this' reference in this method
+            // refers to runBehavior, not CamelGame.
 
             if (sprite.runAnimationRate === 0) {
                 return;
@@ -230,173 +233,192 @@ var CamelGame = function () {
         }
     },
 
-        this.upBehavior = {
-            execute: function (sprite, time, fps) {
-                if (sprite.changing_track) {
-                    if (sprite.track !== 3) {
-                        sprite.track++;
-                    }
-                    sprite.top = CamelGame.calculatePlatformTop(sprite.track) - CamelGame.CAMEL_CELLS_HEIGHT;
-
-                    sprite.changing_track = false; // immediately done jumping for now
+    this.upBehavior = {
+        execute: function (sprite, time, fps) {
+            if (sprite.changing_track) {
+                if (sprite.track !== 3) {
+                    sprite.track++;
                 }
+                sprite.top = CamelGame.calculatePlatformTop(sprite.track) - CamelGame.CAMEL_CELLS_HEIGHT;
+
+                sprite.changing_track = false; // immediately done jumping for now
+            }
+        }
+    },
+
+    this.downBehavior = {
+        execute: function (sprite, time, fps) {
+            if (sprite.changing_track_down) {
+                if (sprite.track !== 1) {
+                    sprite.track--;
+                }
+                sprite.top = CamelGame.calculatePlatformTop(sprite.track) - CamelGame.CAMEL_CELLS_HEIGHT;
+
+                sprite.changing_track_down = false; // immediately done falling for now
+            }
+        }
+    },
+
+    this.paceBehavior = {
+        checkDirection: function (sprite) {
+            var sRight = sprite.left + sprite.width,
+                pRight = sprite.platform.left + sprite.platform.width;
+
+            if (sRight > pRight && sprite.direction === this.RIGHT) {
+                sprite.direction = this.LEFT;
+            }
+            else if (sprite.left < sprite.platform.left &&
+                sprite.direction === this.LEFT) {
+                sprite.direction = this.RIGHT;
             }
         },
 
-        this.downBehavior = {
-            execute: function (sprite, time, fps) {
-                if (sprite.changing_track_down) {
-                    if (sprite.track !== 1) {
-                        sprite.track--;
-                    }
-                    sprite.top = CamelGame.calculatePlatformTop(sprite.track) - CamelGame.CAMEL_CELLS_HEIGHT;
+        moveSprite: function (sprite, fps) {
+            var pixelsToMove = sprite.velocityX / fps;
 
-                    sprite.changing_track_down = false; // immediately done falling for now
-                }
+            if (sprite.direction === this.RIGHT) {
+                sprite.left += pixelsToMove;
+            }
+            else {
+                sprite.left -= pixelsToMove;
             }
         },
 
-        this.paceBehavior = {
-            checkDirection: function (sprite) {
-                var sRight = sprite.left + sprite.width,
-                    pRight = sprite.platform.left + sprite.platform.width;
+        execute: function (sprite, time, fps) {
+            this.checkDirection(sprite);
+            this.moveSprite(sprite, fps);
+        }
+    },
 
-                if (sRight > pRight && sprite.direction === this.RIGHT) {
-                    sprite.direction = this.LEFT;
-                }
-                else if (sprite.left < sprite.platform.left &&
-                    sprite.direction === this.LEFT) {
-                    sprite.direction = this.RIGHT;
-                }
-            },
+    this.ShootBehavior = { // sprite is the runner
+        execute: function (sprite, time, fps) {
+            var spit = sprite.spit;
 
-            moveSprite: function (sprite, fps) {
-                var pixelsToMove = sprite.velocityX / fps;
+            if (!CamelGame.spriteInView(sprite)) {
+                return;
+            }
 
-                if (sprite.direction === this.RIGHT) {
-                    sprite.left += pixelsToMove;
+            if (!spit.visible && CamelGame.runner.shooting ) {
+                spit.top= sprite.top;
+                spit.left = sprite.left+CamelGame.spriteOffset;
+                spit.visible = true;
+                CamelGame.decreaseWater(10);
+            }
+        }
+    };
+
+    this.SpitMoveBehavior = {
+        execute: function (sprite, time, fps) {  // sprite is the spit
+            if (sprite.visible && CamelGame.spriteInView(sprite)) {
+                sprite.left += 1050/fps;    //speed of spit
+            }
+
+            if (!CamelGame.spriteInView(sprite)) {
+                sprite.visible = false;
+                CamelGame.runner.shooting=false;
+            }
+        }
+    };
+
+    //jumping
+
+    this.jumpBehavior = {
+        pause: function (sprite) {
+            if (sprite.ascendAnimationTimer.isRunning()) {
+                sprite.ascendAnimationTimer.pause();
+            }
+            else if (!sprite.descendAnimationTimer.isRunning()) {
+                sprite.descendAnimationTimer.pause();
+            }
+        },
+
+        unpause: function (sprite) {
+            if (sprite.ascendAnimationTimer.isRunning()) {
+                sprite.ascendAnimationTimer.unpause();
+            }
+            else if (sprite.descendAnimationTimer.isRunning()) {
+                sprite.descendAnimationTimer.unpause();
+            }
+        },
+
+        jumpIsOver: function (sprite) {
+            return !sprite.ascendAnimationTimer.isRunning() && !sprite.descendAnimationTimer.isRunning();
+        },
+
+        // Ascent...............................................................
+
+        isAscending: function (sprite) {
+            return sprite.ascendAnimationTimer.isRunning();
+        },
+
+        ascend: function (sprite) {
+            var elapsed = sprite.ascendAnimationTimer.getElapsedTime(),
+                deltaH = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
+            sprite.top = sprite.verticalLaunchPosition - deltaH;
+        },
+
+        isDoneAscending: function (sprite) {
+            return sprite.ascendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION / 2;
+        },
+
+        finishAscent: function (sprite) {
+            sprite.jumpApex = sprite.top;
+            sprite.ascendAnimationTimer.stop();
+            sprite.descendAnimationTimer.start();
+        },
+
+        // Descents.............................................................
+
+        isDescending: function (sprite) {
+            return sprite.descendAnimationTimer.isRunning();
+        },
+
+        descend: function (sprite, verticalVelocity, fps) {
+            var elapsed = sprite.descendAnimationTimer.getElapsedTime(),
+                deltaH = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
+
+            sprite.top = sprite.jumpApex + deltaH;
+        },
+
+        isDoneDescending: function (sprite) {
+            return sprite.descendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION / 2;
+        },
+
+        finishDescent: function (sprite) {
+            sprite.stopJumping();
+
+        },
+
+        // Execute..............................................................
+
+        execute: function (sprite, time, fps) {
+            if (!sprite.jumping || sprite.exploding) {
+                return;
+            }
+
+            if (this.jumpIsOver(sprite)) {
+                sprite.jumping = false;
+                return;
+            }
+
+            if (this.isAscending(sprite)) {
+                if (!this.isDoneAscending(sprite)) {
+                    this.ascend(sprite);
                 }
                 else {
-                    sprite.left -= pixelsToMove;
-                }
-            },
-
-            execute: function (sprite, time, fps) {
-                this.checkDirection(sprite);
-                this.moveSprite(sprite, fps);
-            }
-        },
-
-        this.snailShootBehavior = { // sprite is the snail
-            execute: function (sprite, time, fps) {
-                var bomb = sprite.bomb;
-
-                if (!bomb.visible && sprite.artist.cellIndex === 2) {
-                    bomb.left = sprite.left;
-                    bomb.visible = true;
+                    this.finishAscent(sprite);
                 }
             }
-        },
-
-        //jumping
-
-        this.jumpBehavior = {
-            pause: function (sprite) {
-                if (sprite.ascendAnimationTimer.isRunning()) {
-                    sprite.ascendAnimationTimer.pause();
+            else if (this.isDescending(sprite)) {
+                if (!this.isDoneDescending(sprite)) {
+                    this.descend(sprite);
                 }
-                else if (!sprite.descendAnimationTimer.isRunning()) {
-                    sprite.descendAnimationTimer.pause();
-                }
-            },
-
-            unpause: function (sprite) {
-                if (sprite.ascendAnimationTimer.isRunning()) {
-                    sprite.ascendAnimationTimer.unpause();
-                }
-                else if (sprite.descendAnimationTimer.isRunning()) {
-                    sprite.descendAnimationTimer.unpause();
-                }
-            },
-
-            jumpIsOver: function (sprite) {
-                return !sprite.ascendAnimationTimer.isRunning() && !sprite.descendAnimationTimer.isRunning();
-            },
-
-            // Ascent...............................................................
-
-            isAscending: function (sprite) {
-                return sprite.ascendAnimationTimer.isRunning();
-            },
-
-            ascend: function (sprite) {
-                var elapsed = sprite.ascendAnimationTimer.getElapsedTime(),
-                    deltaH = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
-                sprite.top = sprite.verticalLaunchPosition - deltaH;
-            },
-
-            isDoneAscending: function (sprite) {
-                return sprite.ascendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION / 2;
-            },
-
-            finishAscent: function (sprite) {
-                sprite.jumpApex = sprite.top;
-                sprite.ascendAnimationTimer.stop();
-                sprite.descendAnimationTimer.start();
-            },
-
-            // Descents.............................................................
-
-            isDescending: function (sprite) {
-                return sprite.descendAnimationTimer.isRunning();
-            },
-
-            descend: function (sprite, verticalVelocity, fps) {
-                var elapsed = sprite.descendAnimationTimer.getElapsedTime(),
-                    deltaH = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
-
-                sprite.top = sprite.jumpApex + deltaH;
-            },
-
-            isDoneDescending: function (sprite) {
-                return sprite.descendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION / 2;
-            },
-
-            finishDescent: function (sprite) {
-                sprite.stopJumping();
-
-            },
-
-            // Execute..............................................................
-
-            execute: function (sprite, time, fps) {
-                if (!sprite.jumping || sprite.exploding) {
-                    return;
-                }
-
-                if (this.jumpIsOver(sprite)) {
-                    sprite.jumping = false;
-                    return;
-                }
-
-                if (this.isAscending(sprite)) {
-                    if (!this.isDoneAscending(sprite)) {
-                        this.ascend(sprite);
-                    }
-                    else {
-                        this.finishAscent(sprite);
-                    }
-                }
-                else if (this.isDescending(sprite)) {
-                    if (!this.isDoneDescending(sprite)) {
-                        this.descend(sprite);
-                    }
-                    else {
-                        this.finishDescent(sprite);
-                    }
+                else {
+                    this.finishDescent(sprite);
                 }
             }
-        },
+        }
+    },
 
         // Runner's fall behavior..................................................
 
@@ -428,9 +450,9 @@ var CamelGame = function () {
                 return sprite.velocityY / fps;
             },
 
-            isPlatformUnderneath: function (sprite) {
+            /*isPlatformUnderneath: function (sprite) {
                 return CamelGame.isOverPlatform(sprite) !== -1;
-            },
+            },*/
 
             execute: function (sprite, time, fps) {
                 var deltaY;
@@ -461,18 +483,16 @@ var CamelGame = function () {
                 }
                 else { // will fall below current track
 
-                    if (this.isPlatformUnderneath(sprite)) {
+                   /* if (this.isPlatformUnderneath(sprite)) {
                         this.fallOnPlatform(sprite);
                         sprite.stopFalling();
                     }
-                    else {
+                    else */{
                         sprite.track--;
 
                         sprite.top += deltaY;
 
                         if (sprite.track === 0) {
-                            CamelGame.playSound(snailBait.fallingWhistleSound);
-                            CamelGame.loseLife();
                             sprite.stopFalling();
                             CamelGame.reset();
                             CamelGame.fadeAndRestoreCanvas();
@@ -485,6 +505,8 @@ var CamelGame = function () {
         this.collideBehavior = {
             execute: function (sprite, time, fps, context) {
                 var otherSprite;
+
+              //  if (sprite.type=='spit')
 
                 for (var i = 0; i < CamelGame.sprites.length; ++i) {
                     otherSprite = CamelGame.sprites[i];
@@ -541,7 +563,7 @@ var CamelGame = function () {
             },
 
             processCollision: function (sprite, sprite) {
-                if (sprite.value) { // Modify Snail Bait sprites so they have values
+                if (sprite.value) { // Modify Camel Game sprites so they have values
                     // Keep score...
                 }
 
@@ -559,13 +581,95 @@ var CamelGame = function () {
                         CamelGame.decreaseHealth(sprite);
                         break;
                     case 'tourist':
-                        sprite.visible = false;
+                        CamelGame.decreaseHealth(sprite);
                         CamelGame.splashToast('Попал в кадр!', 1000);
                         break;
                 }
             }
         }
 
+
+    //collision spit with other sprite
+    this.collideSpitBehavior = {
+        execute: function (sprite, time, fps, context) {
+            var otherSprite;
+
+            //  if (sprite.type=='spit')
+
+            for (var i = 0; i < CamelGame.sprites.length; ++i) {
+                otherSprite = CamelGame.sprites[i];
+                if (otherSprite.type == 'runner')
+                    continue;
+                if (this.isCandidateForCollisionSpit(sprite, otherSprite)) {
+                    if (this.didCollideSpit(sprite, otherSprite, context)) {
+                        this.processCollisionSpit(sprite, otherSprite);
+                    }
+                }
+            }
+        },
+
+        isCandidateForCollisionSpit: function (sprite, otherSprite) {
+            return sprite !== otherSprite &&
+                sprite.visible && otherSprite.visible &&
+                otherSprite.left - otherSprite.offset < sprite.left - sprite.offset + sprite.width;
+        },
+
+         didCollideSpit: function (sprite, otherSprite, context) {
+            var MARGIN_TOP = 10,
+                MARGIN_LEFT = 10,
+                MARGIN_RIGHT = 10,
+                MARGIN_BOTTOM = 0,
+                left = otherSprite.left + otherSprite.offset + MARGIN_LEFT,
+                right = otherSprite.left + otherSprite.offset + otherSprite.width - MARGIN_RIGHT,
+                top = otherSprite.top + MARGIN_TOP,
+                bottom = otherSprite.top + otherSprite.height - MARGIN_BOTTOM,
+                centerX = left + otherSprite.width / 2,
+                centerY = otherSprite.top + otherSprite.height / 2;
+
+            return this.SpitCollideWithOther(left, top, right, bottom,
+                sprite, context);
+        },
+
+        SpitCollideWithOther: function (left, top, right, bottom,
+                                                 spit_t, context) {
+            // Determine if the center of the spit lies within
+            // the other sprite bounding box
+
+            context.beginPath();
+            context.rect(left, top, right - left, bottom - top);
+
+            return context.isPointInPath(
+                spit_t.left + spit_t.offset + spit_t.width/2,
+                spit_t.top + spit_t.height/2);
+            //return true;
+        },
+
+        processCollisionSpit: function (sprite, other_sprite) {
+            if (sprite.value) { // Modify Camel Game sprites so they have values
+                // Keep score...
+            }
+
+            switch (other_sprite.type) {
+                case 'bush':
+                    CamelGame.nothingDuing(sprite);
+                    break;
+                case 'oasis':
+                    break;
+                case 'palm':
+                    CamelGame.nothingDuing(sprite);
+                    break;
+                case 'pyramid':
+                    CamelGame.nothingDuing(sprite);
+                    break;
+                case 'tourist':
+                    sprite.visible = false;
+                    CamelGame.runner.shooting = false;
+                    other_sprite.visible=false;
+                    CamelGame.splashToast('В точку!!!', 1000);
+                    break;
+            }
+        }
+    }
     // Sprites...........................................................
 
     this.oases = [],
@@ -580,6 +684,7 @@ var CamelGame = function () {
                 this.upBehavior,
                 this.downBehavior,
                 this.jumpBehavior,
+                this.ShootBehavior,
                 this.collideBehavior
             ]);
 
@@ -589,14 +694,6 @@ var CamelGame = function () {
     // arrays to the sprites array)
 
     this.sprites = [this.runner];
-
-    /* this.explosionAnimator = new SpriteAnimator(
-     this.explosionCells,          // Animation cells
-     this.EXPLOSION_DURATION,      // Duration of the explosion
-     function (sprite, animator) { // Callback after animation
-     sprite.exploding = false;
-     }
-     );*/
 };
 
 
@@ -675,7 +772,7 @@ CamelGame.prototype = {
             return 60;
         }
 
-        fps = 1000 / (now - this.lastAnimationFrameTime);
+        fps = 2000 / (now - this.lastAnimationFrameTime);
         this.lastAnimationFrameTime = now;
 
         if (now - this.lastFpsUpdateTime > 1000) {
@@ -716,6 +813,16 @@ CamelGame.prototype = {
         this.waterProgressBar.adjustValue(sprite.value);
     },
 
+    decreaseWater: function (value) {
+        this.waterProgressBar.adjustValue(-value);
+    },
+
+    nothingDuing: function (sprite)
+    {
+        sprite.visible=false;
+        CamelGame.runner.shooting=false;
+    },
+
     increaseHealth: function (sprite) {
         sprite.visible = false;
         this.healthProgressBar.adjustValue(sprite.value);
@@ -747,7 +854,25 @@ CamelGame.prototype = {
         this.runner.changing_track_down = false;
         this.runner.jumping = false;
         this.runner.falling = false;
+        this.runner.shooting = false;
 
+        //spits
+        this.runner.spit = new Sprite('spit',
+            this.spitArtist,
+            [this.SpitMoveBehavior,
+            this.collideSpitBehavior]);
+
+        this.runner.spit.width = CamelGame.SPIT_WIDTH;
+        this.runner.spit.height = CamelGame.SPIT_HEIGHT;
+
+        this.runner.spit.top = this.runner.top + this.runner.spit.height / 2;
+        this.runner.spit.left = this.runner.left + this.runner.width + 5 + this.runner.spit.width / 2;
+        this.runner.spit.visible = false;
+
+        this.runner.spit.runner = this.runner;  // runner spits maintain a reference to their runner
+
+        this.sprites.push(this.runner.spit);
+        //spits end
         this.runner.up = function () {
             // this method is essentially a switch that turns
             // on the runner's jumping behavior
@@ -813,8 +938,12 @@ CamelGame.prototype = {
             this.jumping = true;
             this.verticalLaunchPosition = this.top;
             this.ascendAnimationTimer.start();
+        };
 
-
+        this.runner.shoot = function () {
+            if (this.shooting) // 'this' is the runner
+                return;
+            this.shooting = true;
         };
     },
     // Toast................................................................
@@ -943,7 +1072,7 @@ CamelGame.prototype = {
     },
 
     spriteInView: function (sprite) {
-        return sprite === this.runner || // runner is always visible
+        return sprite === this.runner  ||// runner is always visible
             (sprite.left + sprite.width > this.spriteOffset &&
             sprite.left < this.spriteOffset + this.canvas.width);
     },
@@ -968,7 +1097,6 @@ CamelGame.prototype = {
         this.positionSprites(this.pyramids, this.pyramidData);
         this.positionSprites(this.bushes, this.bushData);
         this.positionSprites(this.palms, this.palmData);
-        //this.armSnails();
     },
 
     addSpritesToSpriteArray: function () {
@@ -1003,6 +1131,7 @@ CamelGame.prototype = {
             tourist.width = this.TOURIST_WIDTH;
             tourist.height = this.TOURIST_HEIGHT;
 
+            tourist.value=-25;
             this.tourists.push(tourist);
         }
     },
@@ -1065,7 +1194,7 @@ CamelGame.prototype = {
             palm.width = this.PALM_WIDTH;
             palm.height = this.PALM_HEIGHT;
 
-            palm.value = -10;
+            palm.value = -15;
 
             this.palms.push(palm);
         }
@@ -1092,8 +1221,17 @@ document.getElementById('game-canvas').addEventListener("touchstart", function (
 //touch on jump
 document.getElementById('jumpButton').addEventListener("touchstart", function (e) {
     var touch = e.touches[0];
-   CamelGame.runner.jump();
+    CamelGame.runner.jump();
 }, false);
+
+//touch on spit
+document.getElementById('spitButton').addEventListener("touchstart", function (e) {
+    var touch = e.touches[0];
+    if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
+        CamelGame.runner.shoot();
+    }
+}, false);
+
 
 window.onkeydown = function (e) {
     var key = e.keyCode;
@@ -1102,14 +1240,14 @@ window.onkeydown = function (e) {
         CamelGame.togglePaused();
     }
 
-    else if (key === 74) { // 'j'
+    else if (key === 74 || key === 38 || key===87) { // 'j or Up or w'
         if (CamelGame.runnerTrack === 3) {
             return;
         }
         CamelGame.runner.up();
         CamelGame.runnerTrack++;
     }
-    else if (key === 70) { // 'f'
+    else if (key === 70 || key===40 || key===83) { // 'f or Down or s'
         if (CamelGame.runnerTrack === 1) {
             return;
         }
@@ -1119,6 +1257,11 @@ window.onkeydown = function (e) {
     else if (key === 32) { // 'space'
         if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
             CamelGame.runner.jump();
+        }
+    }
+    else if (key === 13) { // 'enter'
+        if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
+            CamelGame.runner.shoot();
         }
     }
 }
