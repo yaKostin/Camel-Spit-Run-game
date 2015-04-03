@@ -1240,14 +1240,14 @@ window.onkeydown = function (e) {
         CamelGame.togglePaused();
     }
 
-    else if (key === 74) { // 'j'
+    else if (key === 74 || key === 38 || key===87) { // 'j or Up or w'
         if (CamelGame.runnerTrack === 3) {
             return;
         }
         CamelGame.runner.up();
         CamelGame.runnerTrack++;
     }
-    else if (key === 70) { // 'f'
+    else if (key === 70 || key===40 || key===83) { // 'f or Down or s'
         if (CamelGame.runnerTrack === 1) {
             return;
         }
