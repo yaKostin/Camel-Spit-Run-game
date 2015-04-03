@@ -10,7 +10,7 @@ var CamelGame = function () {
 
     this.fpsElement = document.getElementById('fps'),
     this.toast = document.getElementById('toast'),
-    this.scoreElement = document.getElementById('score'),
+    this.scoreElement = document.getElementById('score_element'),
     this.healthProgressBar = new ProgressBar('#health'),
     this.waterProgressBar = new ProgressBar('#water'),
 
@@ -125,8 +125,10 @@ var CamelGame = function () {
 
     this.bgVelocity = this.STARTING_BACKGROUND_VELOCITY;
 
+    // Statistics
+    this.score=100;
+    this.score_on_fps=0;
 
-    this.is_shooting = false;
 // Sprite artists...................................................
 
     this.camelCells = [
@@ -582,8 +584,17 @@ var CamelGame = function () {
                         break;
                     case 'tourist':
                         CamelGame.decreaseHealth(sprite);
+                        this.adjustScore(sprite)
                         CamelGame.splashToast('Попал в кадр!', 1000);
                         break;
+                }
+            },
+
+            adjustScore: function (otherSprite) {
+                if (otherSprite.score) {
+                    CamelGame.score -= Math.round(otherSprite.score*0.85);
+                    CamelGame.score = CamelGame.score < 0 ? 0 : CamelGame.score;
+                    CamelGame.scoreElement.innerHTML = CamelGame.score;
                 }
             }
         }
@@ -662,11 +673,21 @@ var CamelGame = function () {
                     CamelGame.nothingDuing(sprite);
                     break;
                 case 'tourist':
+                    this.adjustScore(other_sprite);
                     sprite.visible = false;
                     CamelGame.runner.shooting = false;
                     other_sprite.visible=false;
+
                     CamelGame.splashToast('В точку!!!', 1000);
                     break;
+            }
+        },
+
+        adjustScore: function (otherSprite) {
+            if (otherSprite.score) {
+                CamelGame.score += Math.round(otherSprite.score * ((CamelGame.runner.spit.left - CamelGame.runner.spit.offset) / 500));
+                CamelGame.score = CamelGame.score < 0 ? 0 : CamelGame.score;
+                CamelGame.scoreElement.innerHTML = CamelGame.score;
             }
         }
     }
@@ -1000,6 +1021,11 @@ CamelGame.prototype = {
             CamelGame.fps = CamelGame.calculateFps(now);
             CamelGame.draw(now);
             requestNextAnimationFrame(CamelGame.animate);
+            CamelGame.score_on_fps+=1;
+            if (CamelGame.score_on_fps%30==1) {
+                CamelGame.score+=1;
+                CamelGame.scoreElement.innerHTML = CamelGame.score;
+            }
         }
     },
 
@@ -1020,6 +1046,7 @@ CamelGame.prototype = {
     },
 
     initializeImages: function () {
+        CamelGame.scoreElement.innerHTML = CamelGame.score;
         this.background.src = 'images/background-l1.png';
         //this.spritesheet.src = 'images/sprite_camel_big.png';
         this.spritesheet.src = 'images/sprite-sheet.png';
@@ -1132,6 +1159,7 @@ CamelGame.prototype = {
             tourist.height = this.TOURIST_HEIGHT;
 
             tourist.value=-25;
+            tourist.score=45;
             this.tourists.push(tourist);
         }
     },
