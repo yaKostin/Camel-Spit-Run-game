@@ -17,7 +17,7 @@ Runner HTML5 game with Camel hero
 -added barriers  
 	-increases:  
 	-- oasis (+10% water)  
-	-- bush (+10% health)
+	-- bush (+10% health)   
 	-decreases health:  
 	-- palm (-15 %)  
 	-- pyramid (-20%)  
