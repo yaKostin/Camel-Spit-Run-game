@@ -30,3 +30,9 @@ Runner HTML5 game with Camel hero
 -down track = touch on track, keys: f, s, Down;  
 -jump = touch on jump button, key: space;  
 -spit = touch on spit button, key: enter.  
+
+##Statistics
+-initially given 100 points;  
+-with every 30 frames games added 1 point;  
+-for the collision with the tourist subtracted 45 points;  
+-for shooting the tourist added 45 * (spitting distance of the flight);  
