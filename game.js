@@ -493,8 +493,6 @@ var CamelGame = function () {
                         sprite.top += deltaY;
 
                         if (sprite.track === 0) {
-                          /*  CamelGame.playSound(snailBait.fallingWhistleSound);
-                            CamelGame.loseLife();*/
                             sprite.stopFalling();
                             CamelGame.reset();
                             CamelGame.fadeAndRestoreCanvas();
@@ -526,19 +524,6 @@ var CamelGame = function () {
                 return sprite !== otherSprite &&
                     sprite.visible && otherSprite.visible && !sprite.exploding && !otherSprite.exploding &&
                     otherSprite.left - otherSprite.offset < sprite.left - sprite.offset + sprite.width;
-            },
-
-            didSpitCollideWithOtherSprite: function (left, top, right, bottom,
-                                                     snailBomb, context) {
-                // Determine if the center of the snail bomb lies within
-                // the runner's bounding box
-
-                context.beginPath();
-                context.rect(left, top, right - left, bottom - top);
-
-                return context.isPointInPath(
-                    snailBomb.left - snailBomb.offset + snailBomb.width/2,
-                    snailBomb.top + snailBomb.height/2);
             },
 
             didRunnerCollideWithOtherSprite: function (left, top, right, bottom,
@@ -596,7 +581,7 @@ var CamelGame = function () {
                         CamelGame.decreaseHealth(sprite);
                         break;
                     case 'tourist':
-                        sprite.visible = false;
+                        CamelGame.decreaseHealth(sprite);
                         CamelGame.splashToast('Попал в кадр!', 1000);
                         break;
                 }
@@ -629,19 +614,6 @@ var CamelGame = function () {
                 otherSprite.left - otherSprite.offset < sprite.left - sprite.offset + sprite.width;
         },
 
-        didSpitCollideWithOtherSpriteSpit: function (left, top, right, bottom,
-                                                 snailBomb, context) {
-            // Determine if the center of the snail bomb lies within
-            // the runner's bounding box
-
-            context.beginPath();
-            context.rect(left, top, right - left, bottom - top);
-
-            return context.isPointInPath(
-                snailBomb.left - snailBomb.offset + snailBomb.width/2,
-                snailBomb.top + snailBomb.height/2);
-        },
-
          didCollideSpit: function (sprite, otherSprite, context) {
             var MARGIN_TOP = 10,
                 MARGIN_LEFT = 10,
@@ -660,8 +632,8 @@ var CamelGame = function () {
 
         SpitCollideWithOther: function (left, top, right, bottom,
                                                  spit_t, context) {
-            // Determine if the center of the snail bomb lies within
-            // the runner's bounding box
+            // Determine if the center of the spit lies within
+            // the other sprite bounding box
 
             context.beginPath();
             context.rect(left, top, right - left, bottom - top);
@@ -1159,6 +1131,7 @@ CamelGame.prototype = {
             tourist.width = this.TOURIST_WIDTH;
             tourist.height = this.TOURIST_HEIGHT;
 
+            tourist.value=-25;
             this.tourists.push(tourist);
         }
     },
@@ -1221,7 +1194,7 @@ CamelGame.prototype = {
             palm.width = this.PALM_WIDTH;
             palm.height = this.PALM_HEIGHT;
 
-            palm.value = -10;
+            palm.value = -15;
 
             this.palms.push(palm);
         }
