@@ -128,6 +128,8 @@ var CamelGame = function () {
     // Statistics
     this.score=100;
     this.score_on_fps=0;
+    this.plyaer_name=location.search.substring(1);
+    this.dataBase = openDatabase('CamelDB', '1.0', 'Data Base for statistics', 10 * 1024);
 
 // Sprite artists...................................................
 
@@ -1036,6 +1038,11 @@ CamelGame.prototype = {
         this.initializeImages();
         this.equipRunner();
 
+        //DB
+      /*  this.createOpenDataBase();
+        this.insertIntoDataBase(this.plyaer_name,this.score);
+        this.selectFromDataBase(); */
+
         this.healthProgressBar.adjustValue();
         this.waterProgressBar.adjustValue();
         this.bgVelocity = this.BACKGROUND_VELOCITY;
@@ -1226,6 +1233,38 @@ CamelGame.prototype = {
 
             this.palms.push(palm);
         }
+    },
+
+    createOpenDataBase: function () {
+        if (!CamelGame.dataBase) {
+            alert("Failed to connect to database.");
+        }
+        CamelGame.dataBase.transaction(function (tx) {
+            tx.executeSql('CREATE TABLE IF NOT EXISTS STATISTICS (ID INTEGER PRIMARY KEY ASC, NAME TEXT, SCORE INTEGER)');
+        });
+    },
+
+    insertIntoDataBase: function (player, score) {
+       var plr = "'"+player+"'";
+        CamelGame.dataBase.transaction(function (tx) {
+            tx.executeSql('INSERT INTO STATISTICS ' +
+            '(NAME,SCORE) VALUES (?, ?)',
+                [plr, score])
+        });
+    },
+
+    selectFromDataBase: function () {
+        var items = [,];
+        CamelGame.dataBase.transaction(function (tx) {
+            tx.executeSql('SELECT * FROM STATISTICS ORDER BY SCORE DESC LIMIT 5', [], function (tx, results) {
+                var len = results.rows.length, i;
+                for (i = 0; i < len; i++){
+                    items.push(results.rows.item(i).NAME,results.rows.item(i).SCORE );
+                  //  alert(items.pop());
+                }
+            }, null);
+        });
+        return items;
     }
 };
 
@@ -1336,6 +1375,7 @@ window.onfocus = function (e) {  // unpause if paused
         }, 1000);
     }
 };
+
 
 // Launch game.........................................................
 

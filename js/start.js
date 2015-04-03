@@ -6,12 +6,15 @@ $(document).ready(function () {
                 $('.game_menu').fadeIn(300);
                 startMusic('back');
             });
+          var name = document.getElementById('playerName');
+          name.innerText = $('.name_input').val().trim();
         }
     });
 
     // start
     $('#start_btn').click(function () {
-        window.location = "game.html";
+        var name = document.getElementById('playerName');
+        window.location = "game.html?"+name.innerText;;
     });
 
     // settings dropdown
