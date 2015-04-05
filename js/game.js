@@ -1383,21 +1383,19 @@ function countdown(){
     }
 }
 
-// set hello user
-function setHelloUser() {
-    var href = window.location.href;
-    var index = href.indexOf('?');
-    var playername = href.substring(index + 1);
-    $('#player_name').html(playername);
-}
-
 // start
 $('#start_btn').click(function () {
     $('.start_wr').fadeOut(500, function(){
         CamelGame.start();
         stopgame();
         countdown();
+        $('#continue_btn').css('display', 'block');
     });
+});
+
+// exit
+$('#exit_btn').click(function(){
+    navigator.app.exitApp();
 });
 
 // settings dropdown
@@ -1411,7 +1409,9 @@ $('#settings_btn').click(function () {
 });
 
 // sounds
-var ismuted = true;
+playSound('back');
+
+var ismuted = false;
 $(window).blur(function () {
     document.getElementById('audio_back').pause();
 });
@@ -1441,30 +1441,48 @@ $('#sounds_btn').click(function () {
     }
 });
 
-function startMusic(file) {
-    ismuted = false;
+function playSound(soundType) {
+    if (soundType === "back"){
+        ismuted = false;
 
-    audio = document.createElement("audio");
-    audio.setAttribute("id", "audio_back");
-    audio.setAttribute("loop", "true");
+        audio = document.createElement("audio");
+        audio.setAttribute("id", "audio_back");
+        audio.setAttribute("loop", "true");
+        audio.volume = 0.15;
 
-    var mp3 = document.createElement("source");
-    mp3.setAttribute("src", "audio/" + file + ".mp3");
-    mp3.setAttribute("type", "audio/mpeg");
-    audio.appendChild(mp3);
+        var mp3 = document.createElement("source");
+        mp3.setAttribute("src", "audio/back.mp3");
+        mp3.setAttribute("type", "audio/mpeg");
+        audio.appendChild(mp3);
 
-    var ogg = document.createElement("source");
-    ogg.setAttribute("src", "audio/" + file + ".ogg");
-    ogg.setAttribute("type", "audio/ogg");
-    audio.appendChild(ogg);
+        var ogg = document.createElement("source");
+        ogg.setAttribute("src", "audio/back.ogg");
+        ogg.setAttribute("type", "audio/ogg");
+        audio.appendChild(ogg);
 
-    audio.play();
-
-    document.body.appendChild(audio);
+        audio.play();
+        document.body.appendChild(audio);
+    }
 }
 
-// Launch game.........................................................
-    setHelloUser();
+$('#continue_btn').click(function(){
+    $('.start_wr').fadeOut(500, function(){
+        countdown();
+    });
+})
+
+// pressing buttons on phone
+document.addEventListener("deviceready", function () {
+    document.addEventListener("menubutton", function(){
+        stopgame();
+        $('.start_wr').fadeIn(300);
+    }, true);
+    document.addEventListener("backbutton", function(){
+        e.preventDefault();
+    }, false);
+}, false);
+
+
 });
 
 
