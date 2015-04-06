@@ -1,12 +1,10 @@
 .progressBar {
 
     float: right;
-    width: 90%;
+    width: 85%;
     height: 22px;
     border: 1px solid #111;
     background-color: #292929;
-    /*margin-left: 25px;*/
-    /*margin-left: -25px;*/
 
 }
 
@@ -29,13 +27,13 @@
 }
 
 #health {
-    width: 50%;
+    width: 48%;
     float: right;
 
 }
 
 #water {
-    width: 50%;
+    width: 48%;
     float: left;
     /*margin-left: 25px;*/
 }
