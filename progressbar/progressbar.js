@@ -1,5 +1,5 @@
 var ProgressBar = function (elementName) {
-    this.value = 100,
+    this.value = 20,
         this.progressBarElement = $(elementName);
 };
 
@@ -15,4 +15,7 @@ ProgressBar.prototype = {
         var width = this.value * bar.width() / 100;
         bar.find('div').animate({width: width}, 500).html(this.value + "%&nbsp;");
     },
+    getValue: function(){
+        return this.value;
+    }
 };
