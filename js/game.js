@@ -1450,11 +1450,13 @@ $(window).focus(function () {
 $('#sound_yes').click(function(){
     playSound('back');
     $('.sound_settings_wr').fadeOut(400);
+    $('#music_btn').removeClass('sound_btn_off');
+    $('#sounds_btn').removeClass('sound_btn_off');
 });
-document.getElementById('sound_yes').addEventListener("touchstart", function(){
+document.getElementsByClassname('sound_canvas')[0].addEventListener("touchstart",function(){
+    alert('sdf')
     playSound('back');
-    $('.sound_settings_wr').fadeOut(400);
-}, false);
+},false);
 $('#sound_no').click(function(){
     $('.sound_settings_wr').fadeOut(400);
 });

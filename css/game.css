@@ -166,7 +166,7 @@ html {
     background: #915300;
 }
 
-.menu_btn + .menu_btn, .settings_wr + .menu_btn {
+.menu_btn + .menu_btn, div + .menu_btn {
     margin-top: 10px;
 }
 
@@ -267,7 +267,7 @@ vertical-align: middle;
     border: 0px solid #d3d3d3;
 
     width: 100%;
-    margin: 5% auto 0;
+    margin: 5% auto 10px;
     -moz-border-radius: 5px; /* FF1+ */
     -webkit-border-radius: 5px; /* Saf3-4 */
     border-radius: 5px;
@@ -312,4 +312,7 @@ vertical-align: middle;
 
 .opened .arrows {
     background-position: 0 -9px;
+}
+.sound_canvas {
+    margin: 0 auto;
 }

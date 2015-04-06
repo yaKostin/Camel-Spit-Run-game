@@ -21,23 +21,24 @@
             </div>
             <div class="game_menu">
                 <div class="sound_settings_wr">
-                    <div>Тебе нужны звуки и музыка?</div>
+                    <div>Хочешь слышать музыку и звуки?</div>
                     <div>
                         <span class="sound_yesno" id="sound_yes">Да</span>
                         <span class="sound_yesno" id="sound_yes">Нет</span>
                     </div>
                 </div>
+                <canvas class="sound_canvas" width="200" height="200"></canvas>
                 <button class="menu_btn" id="continue_btn">Продолжить</button>
                 <button class="menu_btn" id="start_btn">Старт</button>
                 <button class="menu_btn" id="settings_btn">Настройки <span class="arrows"></span></button>
                 <div class="settings_wr">
                     <div>
                         <span>Музыка</span>
-                        <button class="sound_btn" id="music_btn"></button>
+                        <button class="sound_btn sound_btn_off" id="music_btn"></button>
                     </div>
                     <div>
                         <span>Звуки</span>
-                        <button class="sound_btn" id="sounds_btn"></button>
+                        <button class="sound_btn sound_btn_off" id="sounds_btn"></button>
                     </div>
                 </div>
                 <button class="menu_btn" id="statistics_btn">Статистика</button>
@@ -45,10 +46,10 @@
                     <div class="statistics_inner">
                         Статистика
                         <table id="statistics_table" class="t1" ></table>
-                        <button class="menu_btn" id="go_menu_btn" style="margin-top: 10px">Назад</button>
+                        <button class="menu_btn" id="go_menu_btn">Назад</button>
                     </div>
                 </div>
-                <button class="menu_btn" id="exit_btn" style="margin-top: 10px">Выход</button>
+                <button class="menu_btn" id="exit_btn">Выход</button>
             </div>
         </div>
     </div>
