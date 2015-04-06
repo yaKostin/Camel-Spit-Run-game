@@ -1040,8 +1040,8 @@ CamelGame.prototype = {
         this.equipRunner();
 
         //DB
-      /*  this.createOpenDataBase();
-        this.insertIntoDataBase(this.plyaer_name,this.score);
+        this.createOpenDataBase();
+        /*this.insertIntoDataBase(this.plyaer_name,this.score);
         this.selectFromDataBase(); */
 
         this.healthProgressBar.adjustValue();
@@ -1255,18 +1255,33 @@ CamelGame.prototype = {
     },
 
     selectFromDataBase: function () {
-        var items = [,];
+        var items = new Array();
         CamelGame.dataBase.transaction(function (tx) {
             tx.executeSql('SELECT * FROM STATISTICS ORDER BY SCORE DESC LIMIT 5', [], function (tx, results) {
                 var len = results.rows.length, i;
-                for (i = 0; i < len; i++){
-                    items.push(results.rows.item(i).NAME,results.rows.item(i).SCORE );
-                  //  alert(items.pop());
+                for (i = 0; i < len; i++) {
+                    items[i] = new Array(results.rows.item(i).NAME, results.rows.item(i).SCORE);
+                }
+
+                var table = document.getElementById('statistics_table');
+                var i;
+                table.innerHTML = '';
+
+                for (i = 0; i < items.length; i++) {
+                    var tr = document.createElement('tr');
+                    tr.id = i.toString();
+                    var td1 = document.createElement('td');
+                    var td2 = document.createElement('td');
+                    table.appendChild(tr);
+                    td1.innerHTML = items[i][0];
+                    document.getElementById(i.toString()).appendChild(td1);
+                    td2.innerHTML = items[i][1];
+                    document.getElementById(i.toString()).appendChild(td2);
                 }
             }, null);
         });
-        return items;
-    },
+
+    }
 };
 
 var CamelGame = new CamelGame();
@@ -1392,6 +1407,18 @@ $('#start_btn').click(function () {
         $('#continue_btn').css('display', 'block');
     });
 });
+
+    //statistics
+
+    $('#statistics_btn').click(function () {
+        $('.statistics').fadeIn(500, function () {
+          CamelGame.selectFromDataBase();
+        });
+    });
+
+    $('#go_menu_btn').click(function () {
+        $('.statistics').fadeOut(500);
+    });
 
 // exit
 $('#exit_btn').click(function(){
