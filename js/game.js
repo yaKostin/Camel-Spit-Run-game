@@ -880,6 +880,7 @@ CamelGame.prototype = {
         this.runner.falling = false;
         this.runner.shooting = false;
 
+
         //spits
         this.runner.spit = new Sprite('spit',
             this.spitArtist,
@@ -965,7 +966,7 @@ CamelGame.prototype = {
         };
 
         this.runner.shoot = function () {
-            if (this.shooting) // 'this' is the runner
+            if (this.shooting || CamelGame.waterProgressBar.getValue()<10) // 'this' is the runner
                 return;
             this.shooting = true;
         };
