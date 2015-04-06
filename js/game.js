@@ -1403,8 +1403,8 @@ function countdown(){
 $('#start_btn').click(function () {
     $('.start_wr').fadeOut(500, function(){
         CamelGame.start();
-        stopgame();
-        countdown();
+        //stopgame();
+       // countdown();
         $('#continue_btn').css('display', 'block');
     });
 });
