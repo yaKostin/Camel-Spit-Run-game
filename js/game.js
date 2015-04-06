@@ -1451,6 +1451,10 @@ $('#sound_yes').click(function(){
     playSound('back');
     $('.sound_settings_wr').fadeOut(400);
 });
+document.getElementById('sound_yes').addEventListener("touchstart", function(){
+    playSound('back');
+    $('.sound_settings_wr').fadeOut(400);
+}, false);
 $('#sound_no').click(function(){
     $('.sound_settings_wr').fadeOut(400);
 });
@@ -1470,12 +1474,7 @@ var musicBtnClick = function(th){
 }
 $('#music_btn').click(function () {
     musicBtnClick($(this));
-});
-// document.getElementById('music_btn').addEventListener("touchstart", function(){
-//     musicBtnClick(this);
-// }, false);
-
-    
+});    
 
 $('#sounds_btn').click(function () {
     if ($(this).hasClass('sound_btn_off')) {
