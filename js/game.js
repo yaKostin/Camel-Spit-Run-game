@@ -1532,10 +1532,7 @@ $('#settings_btn').click(function () {
     $('.settings_wr').slideToggle();
 });
 
-// sounds
-playSound('back');
-
-var ismuted = false;
+var ismuted = true;
 $(window).blur(function () {
     document.getElementById('audio_back').pause();
 });
@@ -1544,19 +1541,35 @@ $(window).focus(function () {
         document.getElementById('audio_back').play();
     }
 });
-$('#music_btn').click(function () {
-    if ($(this).hasClass('sound_btn_off')) {
-        $(this).removeClass('sound_btn_off');
+
+// music btn
+$('#sound_yes').click(function(){
+    playSound('back');
+    $('.sound_settings_wr').fadeOut(400);
+    $('#music_btn').removeClass('sound_btn_off');
+    $('#sounds_btn').removeClass('sound_btn_off');
+});
+$('#sound_no').click(function(){
+    $('.sound_settings_wr').fadeOut(400);
+});
+
+var musicBtnClick = function(th){
+    if ($(th).hasClass('sound_btn_off')) {
+        $(th).removeClass('sound_btn_off');
         document.getElementById('audio_back').muted = false;
         document.getElementById('audio_back').play();
         ismuted = false;
     } else {
-        $(this).addClass('sound_btn_off');
+        $(th).addClass('sound_btn_off');
         document.getElementById('audio_back').muted = true;
         document.getElementById('audio_back').pause();
         ismuted = true;
     }
-});
+}
+$('#music_btn').click(function () {
+    musicBtnClick($(this));
+});    
+
 $('#sounds_btn').click(function () {
     if ($(this).hasClass('sound_btn_off')) {
         $(this).removeClass('sound_btn_off');
