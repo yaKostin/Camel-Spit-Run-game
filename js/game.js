@@ -1055,9 +1055,9 @@ CamelGame.prototype = {
 
     initializeImages: function () {
         CamelGame.scoreElement.innerHTML = CamelGame.score;
-        this.background.src = '../images/background-l1.png';
+        this.background.src = 'images/background-l1.png';
         //this.spritesheet.src = 'images/sprite_camel_big.png';
-        this.spritesheet.src = '../images/sprite-sheet.png';
+        this.spritesheet.src = 'images/sprite-sheet.png';
         this.background.onload = function (e) {
             CamelGame.startGame();
         };
