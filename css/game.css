@@ -214,6 +214,51 @@ html {
     float: right;
 }
 
+.statistics {
+    background: #EEC97B;
+    font-family: 'open_sanscondensed_light';
+    display: none;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10000;
+}
+
+.statistics_inner{
+vertical-align: middle;
+    text-align: center;
+    width: 200px;
+    position: fixed;
+    font-family: open_sanscondensed_light;
+    font-size: 30px;
+    top: 50%;
+    left: 50%;
+    right: 0;
+    bottom: 0;
+    margin-left: -100px;
+    margin-top: -5%;
+
+}
+
+.t1 {
+    overflow: hidden;
+    border: 0px solid #d3d3d3;
+
+    width: 100%;
+    margin: 5% auto 0;
+    -moz-border-radius: 5px; /* FF1+ */
+    -webkit-border-radius: 5px; /* Saf3-4 */
+    border-radius: 5px;
+    -moz-box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+
+    padding: 18px 28px 18px;
+    text-align: center;
+}
+
 .sound_btn {
     display: inline-block;
     width: 28px;
