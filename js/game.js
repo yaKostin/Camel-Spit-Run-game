@@ -1436,7 +1436,7 @@ $('#settings_btn').click(function () {
     $('.settings_wr').slideToggle();
 });
 
-var ismuted = false;
+var ismuted = true;
 $(window).blur(function () {
     document.getElementById('audio_back').pause();
 });
@@ -1453,10 +1453,6 @@ $('#sound_yes').click(function(){
     $('#music_btn').removeClass('sound_btn_off');
     $('#sounds_btn').removeClass('sound_btn_off');
 });
-document.getElementsByClassname('sound_canvas')[0].addEventListener("touchstart",function(){
-    alert('sdf')
-    playSound('back');
-},false);
 $('#sound_no').click(function(){
     $('.sound_settings_wr').fadeOut(400);
 });

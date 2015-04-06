@@ -208,7 +208,7 @@ html {
     color: #C36E00;
 }
 .sound_yesno + .sound_yesno {
-    margin-left: 15px;
+    margin-left: 25px;
 }
 
 .settings_wr {
@@ -312,7 +312,4 @@ vertical-align: middle;
 
 .opened .arrows {
     background-position: 0 -9px;
-}
-.sound_canvas {
-    margin: 0 auto;
 }
