@@ -12,7 +12,7 @@
 <!-- Wrapper..................................................-->
 
 <div id='wrapper'>
-    
+
     <div class="start_wr">
         <div>
             <div class="game_logo">
@@ -34,7 +34,14 @@
                     </div>
                 </div>
                 <button class="menu_btn" id="statistics_btn">Статистика</button>
-                <button class="menu_btn" id="exit_btn">Выход</button>
+                <div class="statistics">
+                    <div class="statistics_inner">
+                        Статистика
+                        <table id="statistics_table" class="t1" ></table>
+                        <button class="menu_btn" id="go_menu_btn" style="margin-top: 10px">Назад</button>
+                    </div>
+                </div>
+                <button class="menu_btn" id="exit_btn" style="margin-top: 10px">Выход</button>
             </div>
         </div>
     </div>
@@ -51,18 +58,17 @@
         <div id='fps'></div>
         <!--Progress bar............................................... -->
         <div id="progress">
+            <div id="water">
+                <img src="progressbar/drop.png">
+                <div class="progressBar">
+                    <div></div>
+                </div>
+            </div>
             <div id="health">
                 <img src="progressbar/cross.png">
 
                 <div class="progressBar">
                     <div style="background-color:red"></div>
-                </div>
-            </div>
-            <div id="water">
-                <img src="progressbar/drop.png" style="margin-left:10px">
-
-                <div class="progressBar">
-                    <div></div>
                 </div>
             </div>
         </div>
