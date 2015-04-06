@@ -1,5 +1,5 @@
 var ProgressBar = function (elementName) {
-    this.value = 20,
+    this.value = 100,
         this.progressBarElement = $(elementName);
 };
 
