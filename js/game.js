@@ -17,9 +17,11 @@ var CamelGame = function () {
 
     // Constants............................................................
 
+    this.LEVEL = 1,
     this.LEFT = 1,
     this.RIGHT = 2,
     this.STATIONARY = 3,
+    this.LEVEL_END, 
 
     // Constants are listed in alphabetical order from here on out
 
@@ -127,9 +129,9 @@ var CamelGame = function () {
     this.bgVelocity = this.STARTING_BACKGROUND_VELOCITY;
 
     // Statistics
-    this.score=100;
-    this.score_on_fps=0;
-    this.plyaer_name=location.search.substring(1);
+    this.score = 0;
+    this.score_on_fps = 0;
+    this.plyaer_name = location.search.substring(1);
     this.dataBase = openDatabase('CamelDB', '1.0', 'Data Base for statistics', 10 * 1024);
 
 // Sprite artists...................................................
@@ -697,20 +699,20 @@ var CamelGame = function () {
     // Sprites...........................................................
 
     this.oases = [],
-        this.tourists = [],
-        this.bushes = [],
-        this.pyramids = [],
-        this.palms = [],
+    this.tourists = [],
+    this.bushes = [],
+    this.pyramids = [],
+    this.palms = [],
 
-        this.runner = new Sprite('runner',          // type
-            this.runnerArtist, // artist
-            [this.runBehavior, // behaviors
-                this.upBehavior,
-                this.downBehavior,
-                this.jumpBehavior,
-                this.ShootBehavior,
-                this.collideBehavior
-            ]);
+    this.runner = new Sprite('runner',          // type
+        this.runnerArtist, // artist
+        [this.runBehavior, // behaviors
+            this.upBehavior,
+            this.downBehavior,
+            this.jumpBehavior,
+            this.ShootBehavior,
+            this.collideBehavior
+        ]);
 
     // All sprites.......................................................
     //
@@ -724,6 +726,91 @@ var CamelGame = function () {
 // CamelGame.prototype ----------------------------------------------------
 
 CamelGame.prototype = {
+
+    setDefaultValues: function () {
+        this.sprites = [this.runner];
+        this.spriteOffset = this.INITIAL_BACKGROUND_OFFSET;
+    },
+
+    updateSpritesTop: function (spritesData, spriteHeight) {
+        for (var i = 0; i < spritesData.length; ++i) {
+            spritesData[i].top -= spriteHeight;
+        }
+    },
+
+    generateLevel: function (levelNum) {
+        var oasesCount,
+            palmsCount,
+            pyramidsCount,
+            touristsCount,
+            bushesCount;
+
+        switch (levelNum) {
+            case 1: 
+                oasesCount = 1;
+                palmsCount = 3;
+                pyramidsCount = 0;
+                touristsCount = 4;
+                bushesCount = 1;
+                break;
+            case 2:
+                oasesCount = 2;
+                palmsCount = 4;
+                pyramidsCount = 3;
+                touristsCount = 4;
+                bushesCount = 2;
+                break;
+            case 2:
+                oasesCount = 3;
+                palmsCount = 10;
+                pyramidsCount = 8;
+                touristsCount = 12;
+                bushesCount = 5;
+                break;
+        }
+
+        var elementLength = 500;
+        var spritesCount = oasesCount + palmsCount + pyramidsCount + touristsCount + bushesCount;
+        this.LEVEL_END = spritesCount * elementLength;
+        var spritesData = new Array();
+
+        //randomize all sprites position
+        for (var i = 0; i < spritesCount; i++) {
+            var spriteData = new Object();
+            spriteData.left = Math.random() * elementLength + elementLength * (i + 2);
+            var platformNum = Math.ceil( Math.random() * 3 );
+            spriteData.top = this.calculatePlatformTop( platformNum );
+            spritesData.push( spriteData );
+        }
+
+        var currentIndex = spritesData.length, temporaryValue, randomIndex ;
+
+        //shuffle all sprites
+        while (0 !== currentIndex) {
+            // Pick a remaining element...
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+
+            // And swap it with the current element.
+            temporaryValue = spritesData[currentIndex];
+            spritesData[currentIndex] = spritesData[randomIndex];
+            spritesData[randomIndex] = temporaryValue;
+        }
+
+        //initialize sprites data
+        this.oasisData = spritesData.slice(0, oasesCount);
+        this.palmData = spritesData.slice(oasesCount, oasesCount + palmsCount);
+        this.pyramidData = spritesData.slice(oasesCount + palmsCount, oasesCount + palmsCount + pyramidsCount);
+        this.touristData = spritesData.slice(oasesCount + palmsCount + pyramidsCount, oasesCount + palmsCount + pyramidsCount + touristsCount);
+        this.bushData = spritesData.slice(oasesCount + palmsCount + pyramidsCount + touristsCount, oasesCount + palmsCount + pyramidsCount + touristsCount + bushesCount);
+        //update sprite top-position relatively to type
+        this.updateSpritesTop(this.oasisData, this.OASIS_HEIGHT);
+        this.updateSpritesTop(this.palmData, this.PALM_HEIGHT);
+        this.updateSpritesTop(this.pyramidData, this.PYRAMID_HEIGHT);
+        this.updateSpritesTop(this.touristData, this.TOURIST_HEIGHT);
+        this.updateSpritesTop(this.bushData, this.BUSH_HEIGHT);
+    },
+
     // Drawing..............................................................
 
     draw: function (now) {
@@ -1032,9 +1119,16 @@ CamelGame.prototype = {
         }
     },
 
+    nextLevel: function () {
+        this.setDefaultValues();
+        this.LEVEL++;
+        this.splashToast("Уровень пройден");
+        this.start();
+    },
     // ------------------------- INITIALIZATION ----------------------------
 
     start: function () {
+        this.generateLevel( this.LEVEL );
         this.createSprites();
         this.initializeImages();
         this.equipRunner();
@@ -1055,9 +1149,9 @@ CamelGame.prototype = {
 
     initializeImages: function () {
         CamelGame.scoreElement.innerHTML = CamelGame.score;
-        this.background.src = '../images/background-l1.png';
+        this.background.src = 'images/background-l1.png';
         //this.spritesheet.src = 'images/sprite_camel_big.png';
-        this.spritesheet.src = '../images/sprite-sheet.png';
+        this.spritesheet.src = 'images/sprite-sheet.png';
         this.background.onload = function (e) {
             CamelGame.startGame();
         };
@@ -1070,7 +1164,7 @@ CamelGame.prototype = {
     positionSprites: function (sprites, spriteData) {
         var sprite;
 
-        for (var i = 0; i < sprites.length; ++i) {
+        for (var i = 0; i < spriteData.length; ++i) {
             sprite = sprites[i];
 
             sprite.top = spriteData[i].top;
@@ -1102,6 +1196,10 @@ CamelGame.prototype = {
                 sprite.draw(this.context);
 
                 this.context.translate(sprite.offset, 0);
+
+                if (this.spriteOffset >= this.LEVEL_END) {
+                    this.nextLevel();
+                }
             }
         }
     },
@@ -1387,8 +1485,6 @@ function countdown(){
 $('#start_btn').click(function () {
     $('.start_wr').fadeOut(500, function(){
         CamelGame.start();
-        stopgame();
-        countdown();
         $('#continue_btn').css('display', 'block');
     });
 });
