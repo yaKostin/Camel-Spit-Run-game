@@ -133,7 +133,7 @@ var CamelGame = function () {
     this.prev_score = 0; 
     this.score = 0;
     this.score_on_fps = 0;
-    this.plyaer_name = location.search.substring(1);
+    this.player_name = location.search.substring(1);
     this.dataBase = openDatabase('CamelDB', '1.0', 'Data Base for statistics', 10 * 1024);
 
 // Sprite artists...................................................
@@ -742,6 +742,8 @@ CamelGame.prototype = {
         this.spriteOffset = this.INITIAL_BACKGROUND_OFFSET;
         this.backgroundOffset = this.INITIAL_BACKGROUND_OFFSET;
         this.bgVelocity = this.INITIAL_BACKGROUND_VELOCITY;
+        this.healthProgressBar.adjustValue(100);
+        this.waterProgressBar.adjustValue(100);
 
     },
 
@@ -1161,15 +1163,29 @@ CamelGame.prototype = {
     },
 
     restartLevel: function() {
+        this.insertIntoDataBase(this.player_name, this.score);
         this.hideLevelStats();
         this.setDefaultValues();
         //this.start();
-        this.healthProgressBar.adjustValue(100);
-        this.waterProgressBar.adjustValue(100);
+
 
         this.setVisibilityToAllSprites();
         this.turnRight();
         //this.start();
+    },
+
+    exitLevels: function (){
+        this.insertIntoDataBase(this.player_name, this.score);
+        this.hideLevelStats();
+
+        this.prev_score = 0;
+        this.score=0;
+        this.setDefaultValues();
+        this.LEVEL=1;
+        /*setTimeout( function (e) {
+         CamelGame.revealLevelStats();
+         }, 2000); */
+       // this.start();
     },
     // ------------------------- INITIALIZATION ----------------------------
 
@@ -1546,6 +1562,7 @@ function countdown(){
 // start
 $('#start_btn').click(function () {
     $('.start_wr').fadeOut(500, function(){
+        countdown();
         CamelGame.start();
         $('#continue_btn').css('display', 'block');
     });
@@ -1646,22 +1663,29 @@ function playSound(soundType) {
         audio.play();
         document.body.appendChild(audio);
     }
-}
+};
 
 $('#continue_btn').click(function(){
     $('.start_wr').fadeOut(500, function(){
         countdown();
+        CamelGame.start();
     });
-})
+});
 
 // pressing buttons on phone
 document.addEventListener("deviceready", function () {
     document.addEventListener("menubutton", function(){
         stopgame();
         $('.start_wr').fadeIn(300);
-    }, true);
+    }, false);
     document.addEventListener("backbutton", function(){
         e.preventDefault();
+    }, false);
+    document.addEventListener("volumedownbutton", function (){
+        audio.volume--;
+    },false);
+    document.addEventListener("volumeupbutton", function (){
+        audio.volume++;
     }, false);
 }, false);
 
@@ -1677,6 +1701,10 @@ document.getElementById("next-level-btn").addEventListener("click", function (e)
 }, false);
 
 document.getElementById("to-menu-btn").addEventListener("click", function (e) {
+    CamelGame.exitLevels();
+    $('.start_wr').fadeIn(500, function(){
+        }
+    );
 }, false);
 
 });
