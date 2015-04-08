@@ -314,3 +314,33 @@ vertical-align: middle;
 .opened .arrows {
     background-position: 0 -9px;
 }
+
+.level-stats {
+    top: 80px;
+    left:0;
+    right:0;
+    margin-left:auto;
+    margin-right:auto;
+    position: absolute;
+    padding-bottom: 20px;
+    text-align: center;
+    width: 500px;
+    background: rgba(0,0,0,0.4);
+    background: rgba(255,255,230,0.9);
+    border: thin solid blue;
+    padding-top: 20px;
+    transition: opacity 2s;
+    box-shadow: rgba(0,0,0,0.5) 8px 8px 16px;
+    border-radius: 10px;
+    z-index: 2;
+    display: none;
+}
+
+#level-stats-score {
+    display: inline-block;
+}
+
+.level-stats-element {
+    float: left;
+    
+}

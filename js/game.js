@@ -14,7 +14,8 @@ var CamelGame = function () {
     this.scoreElement = document.getElementById('score_element'),
     this.healthProgressBar = new ProgressBar('#health'),
     this.waterProgressBar = new ProgressBar('#water'),
-
+    this.levelStatsElement = document.getElementById("level-stats"),
+    this.levelStatsScoreElement = document.getElementById("level-stats-score"),
     // Constants............................................................
 
     this.LEVEL = 1,
@@ -129,6 +130,7 @@ var CamelGame = function () {
     this.bgVelocity = this.STARTING_BACKGROUND_VELOCITY;
 
     // Statistics
+    this.prev_score = 0; 
     this.score = 0;
     this.score_on_fps = 0;
     this.plyaer_name = location.search.substring(1);
@@ -727,9 +729,20 @@ var CamelGame = function () {
 
 CamelGame.prototype = {
 
+    setVisibilityToAllSprites: function () {
+        for (var i = 0; i < this.sprites.length; i++) {
+            if (this.sprites[i].type !== 'spit') 
+                this.sprites[i].visible = true;
+        }
+    }, 
+
     setDefaultValues: function () {
-        this.sprites = [this.runner];
+        this.score = this.prev_score;
+        this.runner.cells = this.camelCells;
         this.spriteOffset = this.INITIAL_BACKGROUND_OFFSET;
+        this.backgroundOffset = this.INITIAL_BACKGROUND_OFFSET;
+        this.bgVelocity = this.INITIAL_BACKGROUND_VELOCITY;
+
     },
 
     updateSpritesTop: function (spritesData, spriteHeight) {
@@ -748,10 +761,10 @@ CamelGame.prototype = {
         switch (levelNum) {
             case 1: 
                 oasesCount = 1;
-                palmsCount = 3;
+                palmsCount = 2;
                 pyramidsCount = 0;
-                touristsCount = 4;
-                bushesCount = 1;
+                touristsCount = 2;
+                bushesCount = 0;
                 break;
             case 2:
                 oasesCount = 2;
@@ -760,7 +773,7 @@ CamelGame.prototype = {
                 touristsCount = 4;
                 bushesCount = 2;
                 break;
-            case 2:
+            case 3:
                 oasesCount = 3;
                 palmsCount = 10;
                 pyramidsCount = 8;
@@ -771,7 +784,7 @@ CamelGame.prototype = {
 
         var elementLength = 500;
         var spritesCount = oasesCount + palmsCount + pyramidsCount + touristsCount + bushesCount;
-        this.LEVEL_END = spritesCount * elementLength;
+        this.LEVEL_END = (spritesCount + 2 ) * elementLength;
         var spritesData = new Array();
 
         //randomize all sprites position
@@ -1058,6 +1071,21 @@ CamelGame.prototype = {
             this.shooting = true;
         };
     },
+
+    // Level statistics.....................................................
+    revealLevelStats: function() {
+        this.togglePaused();
+        this.levelStatsElement.style.display = 'block';
+        this.levelStatsScoreElement.innerHTML = this.score;
+    },
+
+    hideLevelStats: function() {
+        var STATS_REVEAL_DELAY = 1000;
+        CamelGame.levelStatsElement.style.display = 'none';
+        /*setTimeout( function (e) {
+            CamelGame.levelStatsElement.style.display = 'none';
+      }, this.STATS_REVEAL_DELAY);*/
+    },
     // Toast................................................................
 
     splashToast: function (text, howLong) {
@@ -1120,11 +1148,28 @@ CamelGame.prototype = {
         }
     },
 
+    // Levels functions.....................................................
     nextLevel: function () {
+        this.prev_score = this.score;
+        this.hideLevelStats();
         this.setDefaultValues();
         this.LEVEL++;
-        this.splashToast("Уровень пройден");
+        /*setTimeout( function (e) {
+            CamelGame.revealLevelStats();
+        }, 2000); */
         this.start();
+    },
+
+    restartLevel: function() {
+        this.hideLevelStats();
+        this.setDefaultValues();
+        //this.start();
+        this.healthProgressBar.adjustValue(100);
+        this.waterProgressBar.adjustValue(100);
+
+        this.setVisibilityToAllSprites();
+        this.turnRight();
+        //this.start();
     },
     // ------------------------- INITIALIZATION ----------------------------
 
@@ -1199,7 +1244,7 @@ CamelGame.prototype = {
                 this.context.translate(sprite.offset, 0);
 
                 if (this.spriteOffset >= this.LEVEL_END) {
-                    this.nextLevel();
+                    this.revealLevelStats();
                 }
             }
         }
@@ -1234,6 +1279,7 @@ CamelGame.prototype = {
     },
 
     addSpritesToSpriteArray: function () {
+        this.sprites = [ this.runner ];
         for (var i = 0; i < this.oases.length; ++i) {
             this.sprites.push(this.oases[i]);
         }
@@ -1619,6 +1665,19 @@ document.addEventListener("deviceready", function () {
     }, false);
 }, false);
 
+// buttons on level statistics elements
+document.getElementById("restart-level-btn").addEventListener("click", function (e) {
+    CamelGame.togglePaused();
+    CamelGame.restartLevel();
+}, false);
+
+document.getElementById("next-level-btn").addEventListener("click", function (e) {
+    CamelGame.togglePaused();
+    CamelGame.nextLevel();
+}, false);
+
+document.getElementById("to-menu-btn").addEventListener("click", function (e) {
+}, false);
 
 });
 
