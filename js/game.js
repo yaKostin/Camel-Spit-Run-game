@@ -1644,7 +1644,7 @@ $('#sounds_btn').click(function () {
 function playSound(soundType) {
     if (soundType === "back"){
         ismuted = false;
-
+alert("music");
         audio = document.createElement("audio");
         audio.setAttribute("id", "audio_back");
         audio.setAttribute("loop", "true");
@@ -1674,6 +1674,7 @@ $('#continue_btn').click(function(){
 
 // pressing buttons on phone
 document.addEventListener("deviceready", function () {
+    alert("lol");
     document.addEventListener("menubutton", function(){
         stopgame();
         $('.start_wr').fadeIn(300);
