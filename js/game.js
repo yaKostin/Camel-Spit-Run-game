@@ -1672,10 +1672,10 @@ $('#continue_btn').click(function(){
 });
 
 // pressing buttons on phone
-/*document.addEventListener("deviceready", function () {
+document.addEventListener("deviceready", function () {
     alert("lol");
     document.addEventListener("menubutton", function(){
-      //  stopgame();
+        stopgame();
         $('.start_wr').fadeIn(300);
     }, false);
     document.addEventListener("backbutton", function(){
@@ -1687,19 +1687,17 @@ $('#continue_btn').click(function(){
     document.addEventListener("volumeupbutton", function (){
         audio.volume++;
     }, false);
-}, false);*/
+}, false);
 
     document.addEventListener("menubutton", function(){
-        //stopgame();
+        stopgame();
         alert("lol");
         $('.start_wr').fadeIn(300);
     }, false);
     document.addEventListener("backbutton", function(){
-        alert("lolback");
         e.preventDefault();
     }, false);
     document.addEventListener("volumedownbutton", function (){
-        alert("vol-");
         audio.volume--;
     },false);
     document.addEventListener("volumeupbutton", function (){
