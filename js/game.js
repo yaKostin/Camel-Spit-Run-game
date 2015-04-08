@@ -1663,31 +1663,30 @@ function playSound(soundType) {
         audio.play();
         document.body.appendChild(audio);
     }
-}
+};
 
 $('#continue_btn').click(function(){
     $('.start_wr').fadeOut(500, function(){
         countdown();
         CamelGame.start();
     });
-})
+});
 
 // pressing buttons on phone
 document.addEventListener("deviceready", function () {
     document.addEventListener("menubutton", function(){
         stopgame();
         $('.start_wr').fadeIn(300);
-    }, true);
+    }, false);
     document.addEventListener("backbutton", function(){
         e.preventDefault();
     }, false);
     document.addEventListener("volumedownbutton", function (){
         audio.volume--;
-    });
+    },false);
     document.addEventListener("volumeupbutton", function (){
         audio.volume++;
-    });
-
+    }, false);
 }, false);
 
 // buttons on level statistics elements
