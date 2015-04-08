@@ -1644,15 +1644,16 @@ $('#sounds_btn').click(function () {
 function playSound(soundType) {
     if (soundType === "back"){
         ismuted = false;
+alert("music");
         audio = document.createElement("audio");
         audio.setAttribute("id", "audio_back");
         audio.setAttribute("loop", "true");
         audio.volume = 0.15;
 
-        //var mp3 = document.createElement("source");
-        //mp3.setAttribute("src", "audio/back.mp3");
-        //mp3.setAttribute("type", "audio/mpeg");
-        //audio.appendChild(mp3);
+        var mp3 = document.createElement("source");
+        mp3.setAttribute("src", "audio/back.mp3");
+        mp3.setAttribute("type", "audio/mpeg");
+        audio.appendChild(mp3);
 
         var ogg = document.createElement("source");
         ogg.setAttribute("src", "audio/back.ogg");
@@ -1688,21 +1689,6 @@ document.addEventListener("deviceready", function () {
         audio.volume++;
     }, false);
 }, false);
-
-    document.addEventListener("menubutton", function(){
-        stopgame();
-        alert("lol");
-        $('.start_wr').fadeIn(300);
-    }, false);
-    document.addEventListener("backbutton", function(){
-        e.preventDefault();
-    }, false);
-    document.addEventListener("volumedownbutton", function (){
-        audio.volume--;
-    },false);
-    document.addEventListener("volumeupbutton", function (){
-        audio.volume++;
-    }, false);
 
 // buttons on level statistics elements
 document.getElementById("restart-level-btn").addEventListener("click", function (e) {
