@@ -1,433 +1,433 @@
 $(document).ready(function () {
 // CamelGame constructor --------------------------------------------
 
-var CamelGame = function () {
-    this.canvas = document.getElementById('game-canvas');
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
-    this.context = this.canvas.getContext('2d'),
+    var CamelGame = function () {
+        this.canvas = document.getElementById('game-canvas');
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        this.context = this.canvas.getContext('2d');
 
-    // HTML elements........................................................
+        // HTML elements........................................................
 
-    this.fpsElement = document.getElementById('fps'),
-    this.toast = document.getElementById('toast'),
-    this.scoreElement = document.getElementById('score_element'),
-    this.healthProgressBar = new ProgressBar('#health'),
-    this.waterProgressBar = new ProgressBar('#water'),
-    this.levelStatsElement = document.getElementById("level-stats"),
-    this.levelStatsScoreElement = document.getElementById("level-stats-score"),
-    // Constants............................................................
+        this.fpsElement = document.getElementById('fps');
+        this.toast = document.getElementById('toast');
+        this.scoreElement = document.getElementById('score_element');
+        this.healthProgressBar = new ProgressBar('#health');
+        this.waterProgressBar = new ProgressBar('#water');
+        this.levelStatsElement = document.getElementById("level-stats");
+        this.levelStatsScoreElement = document.getElementById("level-stats-score");
+        // Constants............................................................
 
-    this.LEVEL = 1,
-    this.LEFT = 1,
-    this.RIGHT = 2,
-    this.STATIONARY = 3,
-    this.LEVEL_END, 
+        this.LEVEL = 1;
+        this.LEFT = 1;
+        this.RIGHT = 2;
+        this.STATIONARY = 3;
+        this.LEVEL_END;
 
-    // Constants are listed in alphabetical order from here on out
+        // Constants are listed in alphabetical order from here on out
 
-    this.BACKGROUND_VELOCITY = 100,
-    this.DEFAULT_TOAST_TIME = 1000,
+        this.BACKGROUND_VELOCITY = 100;
+        this.DEFAULT_TOAST_TIME = 1000;
 
-    this.PAUSED_CHECK_INTERVAL = 200,
+        this.PAUSED_CHECK_INTERVAL = 200;
 
-    this.CAMEL_CELLS_HEIGHT = 60,
+        this.CAMEL_CELLS_HEIGHT = 60;
 
-    this.STARTING_BACKGROUND_VELOCITY = 0,
+        this.STARTING_BACKGROUND_VELOCITY = 0;
 
-    this.STARTING_BACKGROUND_OFFSET = 0,
-    this.INITIAL_BACKGROUND_OFFSET = 0,
+        this.STARTING_BACKGROUND_OFFSET = 0;
+        this.INITIAL_BACKGROUND_OFFSET = 0;
 
-    this.STARTING_RUNNER_LEFT = 50,
-    this.STARTING_PAGEFLIP_INTERVAL = -1,
-    this.STARTING_RUNNER_TRACK = 1,
-    this.STARTING_RUNNER_VELOCITY = 0,
+        this.STARTING_RUNNER_LEFT = 50;
+        this.STARTING_PAGEFLIP_INTERVAL = -1;
+        this.STARTING_RUNNER_TRACK = 1;
+        this.STARTING_RUNNER_VELOCITY = 0;
 
-    this.GRAVITY_FORCE = 9.81,
-    this.PIXELS_PER_METER = this.canvas.width / 10; // 10 meters, randomly selected width
+        this.GRAVITY_FORCE = 9.81;
+        this.PIXELS_PER_METER = this.canvas.width / 10; // 10 meters, randomly selected width
 
-    this.OASIS_CELLS_HEIGHT = 90,
-    this.OASIS_CELLS_WIDTH = 90,
+        this.OASIS_CELLS_HEIGHT = 90;
+        this.OASIS_CELLS_WIDTH = 90;
 
-    this.TOURIST_CELLS_HEIGHT = 130,
-    this.TOURIST_CELLS_WIDTH = 90,
+        this.TOURIST_CELLS_HEIGHT = 130;
+        this.TOURIST_CELLS_WIDTH = 90;
 
-    this.BUSH_CELLS_WIDTH = 160,
-    this.BUSH_CELLS_HEIGHT = 102,
+        this.BUSH_CELLS_WIDTH = 160;
+        this.BUSH_CELLS_HEIGHT = 102;
 
-    this.PALM_CELLS_WIDTH = 143,
-    this.PALM_CELLS_HEIGHT = 231,
+        this.PALM_CELLS_WIDTH = 143;
+        this.PALM_CELLS_HEIGHT = 231;
 
-    //
-    this.OASIS_WIDTH = 100,
-    this.OASIS_HEIGHT = 80,
+        //
+        this.OASIS_WIDTH = 100;
+        this.OASIS_HEIGHT = 80;
 
-    this.TOURIST_WIDTH = 80,
-    this.TOURIST_HEIGHT = 100,
+        this.TOURIST_WIDTH = 80;
+        this.TOURIST_HEIGHT = 100;
 
-    this.PYRAMID_WIDTH = 90,
-    this.PYRAMID_HEIGHT = 90,
+        this.PYRAMID_WIDTH = 90;
+        this.PYRAMID_HEIGHT = 90;
 
-    this.CAMEL_WIDTH = 80,
-    this.CAMEL_HEIGHT = 60,
+        this.CAMEL_WIDTH = 80;
+        this.CAMEL_HEIGHT = 60;
 
-    this.BUSH_WIDTH = 90,
-    this.BUSH_HEIGHT = 90,
+        this.BUSH_WIDTH = 90;
+        this.BUSH_HEIGHT = 90;
 
-    this.PALM_WIDTH = 80,
-    this.PALM_HEIGHT = 130,
+        this.PALM_WIDTH = 80;
+        this.PALM_HEIGHT = 130;
 
-    this.SPIT_WIDTH = 50,
-    this.SPIT_HEIGHT = 50,
-    // Paused............................................................
+        this.SPIT_WIDTH = 50;
+        this.SPIT_HEIGHT = 50;
+        // Paused............................................................
 
-    this.paused = false,
-    this.pauseStartTime = 0,
-    this.totalTimePaused = 0,
+        this.paused = false;
+        this.pauseStartTime = 0;
+        this.totalTimePaused = 0;
 
-    this.windowHasFocus = true,
+        this.windowHasFocus = true;
 
-    // Track baselines...................................................
+        // Track baselines...................................................
 
-    this.TRACK_1_BASELINE = this.canvas.height,
-    this.TRACK_2_BASELINE = this.canvas.height / 4 * 3,
-    this.TRACK_3_BASELINE = this.canvas.height / 4 * 2,
+        this.TRACK_1_BASELINE = this.canvas.height;
+        this.TRACK_2_BASELINE = this.canvas.height / 4 * 3;
+        this.TRACK_3_BASELINE = this.canvas.height / 4 * 2;
 
-    // Fps indicator.....................................................
+        // Fps indicator.....................................................
 
-    this.fpsToast = document.getElementById('fps'),
+        this.fpsToast = document.getElementById('fps');
 
-    // Images............................................................
+        // Images............................................................
 
-    this.background = new Image(),
-    this.runnerImage = new Image(),
-    this.spritesheet = new Image(),
-    // Time..............................................................
+        this.background = new Image();
+        this.runnerImage = new Image();
+        this.spritesheet = new Image();
+        // Time..............................................................
 
-    this.lastAnimationFrameTime = 0,
-    this.lastFpsUpdateTime = 0,
-    this.fps = 60,
+        this.lastAnimationFrameTime = 0;
+        this.lastFpsUpdateTime = 0;
+        this.fps = 60;
 
-    // Runner track......................................................
+        // Runner track......................................................
 
-    this.runnerTrack = this.STARTING_RUNNER_TRACK,
+        this.runnerTrack = this.STARTING_RUNNER_TRACK;
 
-    // Pageflip timing for runner........................................
+        // Pageflip timing for runner........................................
 
-    this.runnerPageflipInterval = this.STARTING_PAGEFLIP_INTERVAL,
+        this.runnerPageflipInterval = this.STARTING_PAGEFLIP_INTERVAL;
 
-    // Scrolling direction...............................................
+        // Scrolling direction...............................................
 
-    this.scrollingDirection = this.STATIONARY,
+        this.scrollingDirection = this.STATIONARY;
 
-    // Translation offsets...............................................
+        // Translation offsets...............................................
 
-    this.backgroundOffset = this.STARTING_BACKGROUND_OFFSET,
-    this.spriteOffset = this.INITIAL_BACKGROUND_OFFSET,
+        this.backgroundOffset = this.STARTING_BACKGROUND_OFFSET;
+        this.spriteOffset = this.INITIAL_BACKGROUND_OFFSET;
 
-    // Velocities........................................................
+        // Velocities........................................................
 
-    this.bgVelocity = this.STARTING_BACKGROUND_VELOCITY;
+        this.bgVelocity = this.STARTING_BACKGROUND_VELOCITY;
 
-    // Statistics
-    this.prev_score = 0; 
-    this.score = 0;
-    this.score_on_fps = 0;
-    this.player_name = location.search.substring(1);
-    this.dataBase = openDatabase('CamelDB', '1.0', 'Data Base for statistics', 10 * 1024);
+        // Statistics
+        this.prev_score = 0;
+        this.score = 0;
+        this.score_on_fps = 0;
+        this.player_name = location.search.substring(1);
+        this.dataBase = openDatabase('CamelDB', '1.0', 'Data Base for statistics', 10 * 1024);
 
 // Sprite artists...................................................
 
-    this.camelCells = [
-        {left: 0, top: 0, width: 117, height: 90},  //2
-        {left: 235, top: 0, width: 125, height: 90},  //3
-        {left: 365, top: 0, width: 123, height: 90},  //4
-        {left: 494, top: 0, width: 130, height: 90},  //5
-        {left: 627, top: 0, width: 138, height: 90},  //6
-        {left: 766, top: 0, width: 137, height: 90},  //7
-        {left: 902, top: 0, width: 135, height: 90},  //8
-        {left: 1037, top: 0, width: 117, height: 90},  //8
-        {left: 1162, top: 0, width: 115, height: 90},  //8
-        {left: 1280, top: 0, width: 117, height: 90},  //8
-    ],
+        this.camelCells = [
+            {left: 0, top: 0, width: 117, height: 90},  //2
+            {left: 235, top: 0, width: 125, height: 90},  //3
+            {left: 365, top: 0, width: 123, height: 90},  //4
+            {left: 494, top: 0, width: 130, height: 90},  //5
+            {left: 627, top: 0, width: 138, height: 90},  //6
+            {left: 766, top: 0, width: 137, height: 90},  //7
+            {left: 902, top: 0, width: 135, height: 90},  //8
+            {left: 1037, top: 0, width: 117, height: 90},  //8
+            {left: 1162, top: 0, width: 115, height: 90},  //8
+            {left: 1280, top: 0, width: 117, height: 90},  //8
+        ];
 
-    this.spitCells = [
-        {left: 950, top: 298, width: 170, height: 100}
-    ],
+        this.spitCells = [
+            {left: 950, top: 298, width: 170, height: 100}
+        ];
 
-    this.oasisCells = [
-        {left: 192, top: 294, width: 148, height: 90},
-    ],
+        this.oasisCells = [
+            {left: 192, top: 294, width: 148, height: 90},
+        ];
 
-    this.touristCells = [
-        {left: 813, top: 171, width: 153, height: 209},
-    ],
+        this.touristCells = [
+            {left: 813, top: 171, width: 153, height: 209},
+        ];
 
-    this.pyramidCells = [
-        {left: 582, top: 190, width: 197, height: 195},
-    ],
+        this.pyramidCells = [
+            {left: 582, top: 190, width: 197, height: 195},
+        ];
 
-    this.bushCells = [
-        {left: 0, top: 298, width: 160, height: 102},
-    ],
+        this.bushCells = [
+            {left: 0, top: 298, width: 160, height: 102},
+        ];
 
-    this.palmCells = [
-        {left: 414, top: 153, width: this.PALM_CELLS_WIDTH, height: this.PALM_CELLS_HEIGHT},
-    ],
+        this.palmCells = [
+            {left: 414, top: 153, width: this.PALM_CELLS_WIDTH, height: this.PALM_CELLS_HEIGHT},
+        ];
 
-    //
-
-    this.oasisData = [
-        {left: 600, top: this.TRACK_1_BASELINE - this.OASIS_HEIGHT},
-        {left: 1200, top: this.TRACK_2_BASELINE - this.OASIS_HEIGHT},
-        {left: 2450, top: this.TRACK_3_BASELINE - this.OASIS_HEIGHT},
-    ],
-
-    this.touristData = [
-        {left: 600, top: this.TRACK_1_BASELINE - this.TOURIST_HEIGHT},
-        {left: 1600, top: this.TRACK_2_BASELINE - this.TOURIST_HEIGHT},
-        {left: 2600, top: this.TRACK_3_BASELINE - this.TOURIST_HEIGHT},
-    ],
-
-    this.pyramidData = [
-        {left: 1400, top: this.TRACK_1_BASELINE - this.OASIS_HEIGHT},
-        {left: 2200, top: this.TRACK_1_BASELINE - this.OASIS_HEIGHT},
-    ],
-
-    this.bushData = [
-        {left: 954, top: this.TRACK_1_BASELINE - this.BUSH_HEIGHT},
-        {left: 1754, top: this.TRACK_3_BASELINE - this.BUSH_HEIGHT},
-        {left: 3100, top: this.TRACK_2_BASELINE - this.BUSH_HEIGHT},
-    ],
-
-    this.palmData = [
-        {left: 1340, top: this.TRACK_3_BASELINE - this.PALM_HEIGHT},
-        {left: 2301, top: this.TRACK_2_BASELINE - this.PALM_HEIGHT},
-        {left: 3304, top: this.TRACK_3_BASELINE - this.PALM_HEIGHT},
-    ],
-
-    this.runnerArtist = new SpriteSheetArtist(this.spritesheet, this.camelCells);
-    this.spitArtist = new SpriteSheetArtist(this.spritesheet, this.spitCells);
-
-    // Sprite behaviors.................................................
-
-    this.runBehavior = {
-        // Every runAnimationRate milliseconds, this behavior advances the
-        // runner's artist to the next frame of the spritesheet, provided the
-        // runner is not jumping or falling.
         //
-        // This behavior is similar to the more general Cycle behavior in
-        // js/behaviors. The difference is that this behavior does not advance
-        // the sprite's artist if the sprite is jumping, falling, or the
-        // runner's runAnimationRate is 0.
 
-        lastAdvanceTime: 0,
+        this.oasisData = [
+            {left: 600, top: this.TRACK_1_BASELINE - this.OASIS_HEIGHT},
+            {left: 1200, top: this.TRACK_2_BASELINE - this.OASIS_HEIGHT},
+            {left: 2450, top: this.TRACK_3_BASELINE - this.OASIS_HEIGHT},
+        ];
 
-        execute: function (sprite, time, fps) {
-            // Realize that this is a method in an object (runBehavior), that resides
-            // in another object (CamelGame), so the 'this' reference in this method
-            // refers to runBehavior, not CamelGame.
+        this.touristData = [
+            {left: 600, top: this.TRACK_1_BASELINE - this.TOURIST_HEIGHT},
+            {left: 1600, top: this.TRACK_2_BASELINE - this.TOURIST_HEIGHT},
+            {left: 2600, top: this.TRACK_3_BASELINE - this.TOURIST_HEIGHT},
+        ];
 
-            if (sprite.runAnimationRate === 0) {
-                return;
-            }
+        this.pyramidData = [
+            {left: 1400, top: this.TRACK_1_BASELINE - this.OASIS_HEIGHT},
+            {left: 2200, top: this.TRACK_1_BASELINE - this.OASIS_HEIGHT},
+        ];
 
-            if (this.lastAdvanceTime === 0) {  // skip first time
-                this.lastAdvanceTime = time;
-            }
-            else if (time - this.lastAdvanceTime > 1000 / sprite.runAnimationRate) {
-                sprite.artist.advance();
-                this.lastAdvanceTime = time;
-            }
-        }
-    },
+        this.bushData = [
+            {left: 954, top: this.TRACK_1_BASELINE - this.BUSH_HEIGHT},
+            {left: 1754, top: this.TRACK_3_BASELINE - this.BUSH_HEIGHT},
+            {left: 3100, top: this.TRACK_2_BASELINE - this.BUSH_HEIGHT},
+        ];
 
-    this.upBehavior = {
-        execute: function (sprite, time, fps) {
-            if (sprite.changing_track) {
-                if (sprite.track !== 3) {
-                    sprite.track++;
+        this.palmData = [
+            {left: 1340, top: this.TRACK_3_BASELINE - this.PALM_HEIGHT},
+            {left: 2301, top: this.TRACK_2_BASELINE - this.PALM_HEIGHT},
+            {left: 3304, top: this.TRACK_3_BASELINE - this.PALM_HEIGHT},
+        ];
+
+        this.runnerArtist = new SpriteSheetArtist(this.spritesheet, this.camelCells);
+        this.spitArtist = new SpriteSheetArtist(this.spritesheet, this.spitCells);
+
+        // Sprite behaviors.................................................
+
+        this.runBehavior = {
+            // Every runAnimationRate milliseconds, this behavior advances the
+            // runner's artist to the next frame of the spritesheet, provided the
+            // runner is not jumping or falling.
+            //
+            // This behavior is similar to the more general Cycle behavior in
+            // js/behaviors. The difference is that this behavior does not advance
+            // the sprite's artist if the sprite is jumping, falling, or the
+            // runner's runAnimationRate is 0.
+
+            lastAdvanceTime: 0,
+
+            execute: function (sprite, time, fps) {
+                // Realize that this is a method in an object (runBehavior), that resides
+                // in another object (CamelGame), so the 'this' reference in this method
+                // refers to runBehavior, not CamelGame.
+
+                if (sprite.runAnimationRate === 0) {
+                    return;
                 }
-                sprite.top = CamelGame.calculatePlatformTop(sprite.track) - CamelGame.CAMEL_CELLS_HEIGHT;
 
-                sprite.changing_track = false; // immediately done jumping for now
-            }
-        }
-    },
-
-    this.downBehavior = {
-        execute: function (sprite, time, fps) {
-            if (sprite.changing_track_down) {
-                if (sprite.track !== 1) {
-                    sprite.track--;
+                if (this.lastAdvanceTime === 0) {  // skip first time
+                    this.lastAdvanceTime = time;
                 }
-                sprite.top = CamelGame.calculatePlatformTop(sprite.track) - CamelGame.CAMEL_CELLS_HEIGHT;
-
-                sprite.changing_track_down = false; // immediately done falling for now
+                else if (time - this.lastAdvanceTime > 1000 / sprite.runAnimationRate) {
+                    sprite.artist.advance();
+                    this.lastAdvanceTime = time;
+                }
             }
-        }
-    },
+        };
 
-    this.paceBehavior = {
-        checkDirection: function (sprite) {
-            var sRight = sprite.left + sprite.width,
-                pRight = sprite.platform.left + sprite.platform.width;
+        this.upBehavior = {
+            execute: function (sprite, time, fps) {
+                if (sprite.changing_track) {
+                    if (sprite.track !== 3) {
+                        sprite.track++;
+                    }
+                    sprite.top = CamelGame.calculatePlatformTop(sprite.track) - CamelGame.CAMEL_CELLS_HEIGHT;
 
-            if (sRight > pRight && sprite.direction === this.RIGHT) {
-                sprite.direction = this.LEFT;
+                    sprite.changing_track = false; // immediately done jumping for now
+                }
             }
-            else if (sprite.left < sprite.platform.left &&
-                sprite.direction === this.LEFT) {
-                sprite.direction = this.RIGHT;
+        };
+
+        this.downBehavior = {
+            execute: function (sprite, time, fps) {
+                if (sprite.changing_track_down) {
+                    if (sprite.track !== 1) {
+                        sprite.track--;
+                    }
+                    sprite.top = CamelGame.calculatePlatformTop(sprite.track) - CamelGame.CAMEL_CELLS_HEIGHT;
+
+                    sprite.changing_track_down = false; // immediately done falling for now
+                }
             }
-        },
+        };
 
-        moveSprite: function (sprite, fps) {
-            var pixelsToMove = sprite.velocityX / fps;
+        this.paceBehavior = {
+            checkDirection: function (sprite) {
+                var sRight = sprite.left + sprite.width,
+                    pRight = sprite.platform.left + sprite.platform.width;
 
-            if (sprite.direction === this.RIGHT) {
-                sprite.left += pixelsToMove;
-            }
-            else {
-                sprite.left -= pixelsToMove;
-            }
-        },
+                if (sRight > pRight && sprite.direction === this.RIGHT) {
+                    sprite.direction = this.LEFT;
+                }
+                else if (sprite.left < sprite.platform.left &&
+                    sprite.direction === this.LEFT) {
+                    sprite.direction = this.RIGHT;
+                }
+            },
 
-        execute: function (sprite, time, fps) {
-            this.checkDirection(sprite);
-            this.moveSprite(sprite, fps);
-        }
-    },
+            moveSprite: function (sprite, fps) {
+                var pixelsToMove = sprite.velocityX / fps;
 
-    this.ShootBehavior = { // sprite is the runner
-        execute: function (sprite, time, fps) {
-            var spit = sprite.spit;
-
-            if (!CamelGame.spriteInView(sprite)) {
-                return;
-            }
-
-            if (!spit.visible && CamelGame.runner.shooting ) {
-                spit.top= sprite.top;
-                spit.left = sprite.left+CamelGame.spriteOffset;
-                spit.visible = true;
-                CamelGame.decreaseWater(10);
-            }
-        }
-    };
-
-    this.SpitMoveBehavior = {
-        execute: function (sprite, time, fps) {  // sprite is the spit
-            if (sprite.visible && CamelGame.spriteInView(sprite)) {
-                sprite.left += 1050/fps;    //speed of spit
-            }
-
-            if (!CamelGame.spriteInView(sprite)) {
-                sprite.visible = false;
-                CamelGame.runner.shooting=false;
-            }
-        }
-    };
-
-    //jumping
-
-    this.jumpBehavior = {
-        pause: function (sprite) {
-            if (sprite.ascendAnimationTimer.isRunning()) {
-                sprite.ascendAnimationTimer.pause();
-            }
-            else if (!sprite.descendAnimationTimer.isRunning()) {
-                sprite.descendAnimationTimer.pause();
-            }
-        },
-
-        unpause: function (sprite) {
-            if (sprite.ascendAnimationTimer.isRunning()) {
-                sprite.ascendAnimationTimer.unpause();
-            }
-            else if (sprite.descendAnimationTimer.isRunning()) {
-                sprite.descendAnimationTimer.unpause();
-            }
-        },
-
-        jumpIsOver: function (sprite) {
-            return !sprite.ascendAnimationTimer.isRunning() && !sprite.descendAnimationTimer.isRunning();
-        },
-
-        // Ascent...............................................................
-
-        isAscending: function (sprite) {
-            return sprite.ascendAnimationTimer.isRunning();
-        },
-
-        ascend: function (sprite) {
-            var elapsed = sprite.ascendAnimationTimer.getElapsedTime(),
-                deltaH = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
-            sprite.top = sprite.verticalLaunchPosition - deltaH;
-        },
-
-        isDoneAscending: function (sprite) {
-            return sprite.ascendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION / 2;
-        },
-
-        finishAscent: function (sprite) {
-            sprite.jumpApex = sprite.top;
-            sprite.ascendAnimationTimer.stop();
-            sprite.descendAnimationTimer.start();
-        },
-
-        // Descents.............................................................
-
-        isDescending: function (sprite) {
-            return sprite.descendAnimationTimer.isRunning();
-        },
-
-        descend: function (sprite, verticalVelocity, fps) {
-            var elapsed = sprite.descendAnimationTimer.getElapsedTime(),
-                deltaH = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
-
-            sprite.top = sprite.jumpApex + deltaH;
-        },
-
-        isDoneDescending: function (sprite) {
-            return sprite.descendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION / 2;
-        },
-
-        finishDescent: function (sprite) {
-            sprite.stopJumping();
-
-        },
-
-        // Execute..............................................................
-
-        execute: function (sprite, time, fps) {
-            if (!sprite.jumping || sprite.exploding) {
-                return;
-            }
-
-            if (this.jumpIsOver(sprite)) {
-                sprite.jumping = false;
-                return;
-            }
-
-            if (this.isAscending(sprite)) {
-                if (!this.isDoneAscending(sprite)) {
-                    this.ascend(sprite);
+                if (sprite.direction === this.RIGHT) {
+                    sprite.left += pixelsToMove;
                 }
                 else {
-                    this.finishAscent(sprite);
+                    sprite.left -= pixelsToMove;
+                }
+            },
+
+            execute: function (sprite, time, fps) {
+                this.checkDirection(sprite);
+                this.moveSprite(sprite, fps);
+            }
+        };
+
+        this.ShootBehavior = { // sprite is the runner
+            execute: function (sprite, time, fps) {
+                var spit = sprite.spit;
+
+                if (!CamelGame.spriteInView(sprite)) {
+                    return;
+                }
+
+                if (!spit.visible && CamelGame.runner.shooting) {
+                    spit.top = sprite.top;
+                    spit.left = sprite.left + CamelGame.spriteOffset;
+                    spit.visible = true;
+                    CamelGame.decreaseWater(10);
                 }
             }
-            else if (this.isDescending(sprite)) {
-                if (!this.isDoneDescending(sprite)) {
-                    this.descend(sprite);
+        };
+
+        this.SpitMoveBehavior = {
+            execute: function (sprite, time, fps) {  // sprite is the spit
+                if (sprite.visible && CamelGame.spriteInView(sprite)) {
+                    sprite.left += 1050 / fps;    //speed of spit
                 }
-                else {
-                    this.finishDescent(sprite);
+
+                if (!CamelGame.spriteInView(sprite)) {
+                    sprite.visible = false;
+                    CamelGame.runner.shooting = false;
                 }
             }
-        }
-    },
+        };
+
+        //jumping
+
+        this.jumpBehavior = {
+            pause: function (sprite) {
+                if (sprite.ascendAnimationTimer.isRunning()) {
+                    sprite.ascendAnimationTimer.pause();
+                }
+                else if (!sprite.descendAnimationTimer.isRunning()) {
+                    sprite.descendAnimationTimer.pause();
+                }
+            },
+
+            unpause: function (sprite) {
+                if (sprite.ascendAnimationTimer.isRunning()) {
+                    sprite.ascendAnimationTimer.unpause();
+                }
+                else if (sprite.descendAnimationTimer.isRunning()) {
+                    sprite.descendAnimationTimer.unpause();
+                }
+            },
+
+            jumpIsOver: function (sprite) {
+                return !sprite.ascendAnimationTimer.isRunning() && !sprite.descendAnimationTimer.isRunning();
+            },
+
+            // Ascent...............................................................
+
+            isAscending: function (sprite) {
+                return sprite.ascendAnimationTimer.isRunning();
+            },
+
+            ascend: function (sprite) {
+                var elapsed = sprite.ascendAnimationTimer.getElapsedTime(),
+                    deltaH = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
+                sprite.top = sprite.verticalLaunchPosition - deltaH;
+            },
+
+            isDoneAscending: function (sprite) {
+                return sprite.ascendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION / 2;
+            },
+
+            finishAscent: function (sprite) {
+                sprite.jumpApex = sprite.top;
+                sprite.ascendAnimationTimer.stop();
+                sprite.descendAnimationTimer.start();
+            },
+
+            // Descents.............................................................
+
+            isDescending: function (sprite) {
+                return sprite.descendAnimationTimer.isRunning();
+            },
+
+            descend: function (sprite, verticalVelocity, fps) {
+                var elapsed = sprite.descendAnimationTimer.getElapsedTime(),
+                    deltaH = elapsed / (sprite.JUMP_DURATION / 2) * sprite.JUMP_HEIGHT;
+
+                sprite.top = sprite.jumpApex + deltaH;
+            },
+
+            isDoneDescending: function (sprite) {
+                return sprite.descendAnimationTimer.getElapsedTime() > sprite.JUMP_DURATION / 2;
+            },
+
+            finishDescent: function (sprite) {
+                sprite.stopJumping();
+
+            },
+
+            // Execute..............................................................
+
+            execute: function (sprite, time, fps) {
+                if (!sprite.jumping || sprite.exploding) {
+                    return;
+                }
+
+                if (this.jumpIsOver(sprite)) {
+                    sprite.jumping = false;
+                    return;
+                }
+
+                if (this.isAscending(sprite)) {
+                    if (!this.isDoneAscending(sprite)) {
+                        this.ascend(sprite);
+                    }
+                    else {
+                        this.finishAscent(sprite);
+                    }
+                }
+                else if (this.isDescending(sprite)) {
+                    if (!this.isDoneDescending(sprite)) {
+                        this.descend(sprite);
+                    }
+                    else {
+                        this.finishDescent(sprite);
+                    }
+                }
+            }
+        };
 
         // Runner's fall behavior..................................................
 
@@ -460,8 +460,8 @@ var CamelGame = function () {
             },
 
             /*isPlatformUnderneath: function (sprite) {
-                return CamelGame.isOverPlatform(sprite) !== -1;
-            },*/
+             return CamelGame.isOverPlatform(sprite) !== -1;
+             },*/
 
             execute: function (sprite, time, fps) {
                 var deltaY;
@@ -492,11 +492,12 @@ var CamelGame = function () {
                 }
                 else { // will fall below current track
 
-                   /* if (this.isPlatformUnderneath(sprite)) {
-                        this.fallOnPlatform(sprite);
-                        sprite.stopFalling();
-                    }
-                    else */{
+                    /* if (this.isPlatformUnderneath(sprite)) {
+                     this.fallOnPlatform(sprite);
+                     sprite.stopFalling();
+                     }
+                     else */
+                    {
                         sprite.track--;
 
                         sprite.top += deltaY;
@@ -509,13 +510,13 @@ var CamelGame = function () {
                     }
                 }
             }
-        },
+        };
         //collisions
         this.collideBehavior = {
             execute: function (sprite, time, fps, context) {
                 var otherSprite;
 
-              //  if (sprite.type=='spit')
+                //  if (sprite.type=='spit')
 
                 for (var i = 0; i < CamelGame.sprites.length; ++i) {
                     otherSprite = CamelGame.sprites[i];
@@ -584,1128 +585,1144 @@ var CamelGame = function () {
                         CamelGame.increaseWater(sprite);
                         break;
                     case 'palm':
+                        var audio = new Audio();
+                        audio.src = 'audio/udar.ogg';
+                        audio.autoplay = true;
                         CamelGame.decreaseHealth(sprite);
                         break;
                     case 'pyramid':
+                        var audio = new Audio();
+                        audio.src = 'audio/udar.ogg';
+                        audio.autoplay = true;
                         CamelGame.decreaseHealth(sprite);
                         break;
                     case 'tourist':
+                        var audio = new Audio();
+                        audio.src = 'audio/foto.mp3';
+                        audio.autoplay = true;
                         CamelGame.decreaseHealth(sprite);
-                        this.adjustScore(sprite)
+                        this.adjustScore(sprite);
                         CamelGame.splashToast('Попал в кадр!', 1000);
+
                         break;
                 }
             },
 
             adjustScore: function (otherSprite) {
                 if (otherSprite.score) {
-                    CamelGame.score -= Math.round(otherSprite.score*0.85);
+                    CamelGame.score -= Math.round(otherSprite.score * 0.85);
                     CamelGame.score = CamelGame.score < 0 ? 0 : CamelGame.score;
                     CamelGame.scoreElement.innerHTML = CamelGame.score;
                 }
             }
-        }
+        };
 
 
-    //collision spit with other sprite
-    this.collideSpitBehavior = {
-        execute: function (sprite, time, fps, context) {
-            var otherSprite;
+        //collision spit with other sprite
+        this.collideSpitBehavior = {
+            execute: function (sprite, time, fps, context) {
+                var otherSprite;
 
-            //  if (sprite.type=='spit')
+                //  if (sprite.type=='spit')
 
-            for (var i = 0; i < CamelGame.sprites.length; ++i) {
-                otherSprite = CamelGame.sprites[i];
-                if (otherSprite.type == 'runner')
-                    continue;
-                if (this.isCandidateForCollisionSpit(sprite, otherSprite)) {
-                    if (this.didCollideSpit(sprite, otherSprite, context)) {
-                        this.processCollisionSpit(sprite, otherSprite);
+                for (var i = 0; i < CamelGame.sprites.length; ++i) {
+                    otherSprite = CamelGame.sprites[i];
+                    if (otherSprite.type == 'runner')
+                        continue;
+                    if (this.isCandidateForCollisionSpit(sprite, otherSprite)) {
+                        if (this.didCollideSpit(sprite, otherSprite, context)) {
+                            this.processCollisionSpit(sprite, otherSprite);
+                        }
                     }
                 }
+            },
+
+            isCandidateForCollisionSpit: function (sprite, otherSprite) {
+                return sprite !== otherSprite &&
+                    sprite.visible && otherSprite.visible &&
+                    otherSprite.left - otherSprite.offset < sprite.left - sprite.offset + sprite.width;
+            },
+
+            didCollideSpit: function (sprite, otherSprite, context) {
+                var MARGIN_TOP = 10,
+                    MARGIN_LEFT = 10,
+                    MARGIN_RIGHT = 10,
+                    MARGIN_BOTTOM = 0,
+                    left = otherSprite.left + otherSprite.offset + MARGIN_LEFT,
+                    right = otherSprite.left + otherSprite.offset + otherSprite.width - MARGIN_RIGHT,
+                    top = otherSprite.top + MARGIN_TOP,
+                    bottom = otherSprite.top + otherSprite.height - MARGIN_BOTTOM,
+                    centerX = left + otherSprite.width / 2,
+                    centerY = otherSprite.top + otherSprite.height / 2;
+
+                return this.SpitCollideWithOther(left, top, right, bottom,
+                    sprite, context);
+            },
+
+            SpitCollideWithOther: function (left, top, right, bottom,
+                                            spit_t, context) {
+                // Determine if the center of the spit lies within
+                // the other sprite bounding box
+
+                context.beginPath();
+                context.rect(left, top, right - left, bottom - top);
+
+                return context.isPointInPath(
+                    spit_t.left + spit_t.offset + spit_t.width / 2,
+                    spit_t.top + spit_t.height / 2);
+                //return true;
+            },
+
+            processCollisionSpit: function (sprite, other_sprite) {
+                if (sprite.value) { // Modify Camel Game sprites so they have values
+                    // Keep score...
+                }
+
+                switch (other_sprite.type) {
+                    case 'bush':
+                        var audio = new Audio();
+                        audio.src = "audio/pl_stolkn.mp3";
+                        audio.autoplay = true;
+                        CamelGame.nothingDuing(sprite);
+                        break;
+                    case 'oasis':
+                        break;
+                    case 'palm':
+                        var audio = new Audio();
+                        audio.src = 'audio/pl_stolkn.mp3';
+                        audio.autoplay = true;
+                        CamelGame.nothingDuing(sprite);
+                        break;
+                    case 'pyramid':
+                        var audio = new Audio();
+                        audio.src = 'audio/pl_stolkn.mp3';
+                        audio.autoplay = true;
+                        CamelGame.nothingDuing(sprite);
+                        break;
+                    case 'tourist':
+                        var audio = new Audio();
+                        audio.src = 'audio/smeh.mp3';
+                        audio.autoplay = true;
+                        this.adjustScore(other_sprite);
+                        sprite.visible = false;
+                        CamelGame.runner.shooting = false;
+                        other_sprite.visible = false;
+
+                        CamelGame.splashToast('В точку!!!', 1000);
+                        break;
+                }
+            },
+
+            adjustScore: function (otherSprite) {
+                if (otherSprite.score) {
+                    CamelGame.score += Math.round(otherSprite.score * ((CamelGame.runner.spit.left - CamelGame.runner.spit.offset) / 500));
+                    CamelGame.score = CamelGame.score < 0 ? 0 : CamelGame.score;
+                    CamelGame.scoreElement.innerHTML = CamelGame.score;
+                }
             }
-        },
+        };
+        // Sprites...........................................................
 
-        isCandidateForCollisionSpit: function (sprite, otherSprite) {
-            return sprite !== otherSprite &&
-                sprite.visible && otherSprite.visible &&
-                otherSprite.left - otherSprite.offset < sprite.left - sprite.offset + sprite.width;
-        },
+        this.oases = [];
+        this.tourists = [];
+        this.bushes = [];
+        this.pyramids = [];
+        this.palms = [];
 
-         didCollideSpit: function (sprite, otherSprite, context) {
-            var MARGIN_TOP = 10,
-                MARGIN_LEFT = 10,
-                MARGIN_RIGHT = 10,
-                MARGIN_BOTTOM = 0,
-                left = otherSprite.left + otherSprite.offset + MARGIN_LEFT,
-                right = otherSprite.left + otherSprite.offset + otherSprite.width - MARGIN_RIGHT,
-                top = otherSprite.top + MARGIN_TOP,
-                bottom = otherSprite.top + otherSprite.height - MARGIN_BOTTOM,
-                centerX = left + otherSprite.width / 2,
-                centerY = otherSprite.top + otherSprite.height / 2;
+        this.runner = new Sprite('runner',          // type
+            this.runnerArtist, // artist
+            [this.runBehavior, // behaviors
+                this.upBehavior,
+                this.downBehavior,
+                this.jumpBehavior,
+                this.ShootBehavior,
+                this.collideBehavior
+            ]);
 
-            return this.SpitCollideWithOther(left, top, right, bottom,
-                sprite, context);
-        },
+        // All sprites.......................................................
+        //
+        // (addSpritesToSpriteArray() adds sprites from the preceding sprite
+        // arrays to the sprites array)
 
-        SpitCollideWithOther: function (left, top, right, bottom,
-                                                 spit_t, context) {
-            // Determine if the center of the spit lies within
-            // the other sprite bounding box
-
-            context.beginPath();
-            context.rect(left, top, right - left, bottom - top);
-
-            return context.isPointInPath(
-                spit_t.left + spit_t.offset + spit_t.width/2,
-                spit_t.top + spit_t.height/2);
-            //return true;
-        },
-
-        processCollisionSpit: function (sprite, other_sprite) {
-            if (sprite.value) { // Modify Camel Game sprites so they have values
-                // Keep score...
-            }
-
-            switch (other_sprite.type) {
-                case 'bush':
-                    CamelGame.nothingDuing(sprite);
-                    break;
-                case 'oasis':
-                    break;
-                case 'palm':
-                    CamelGame.nothingDuing(sprite);
-                    break;
-                case 'pyramid':
-                    CamelGame.nothingDuing(sprite);
-                    break;
-                case 'tourist':
-                    this.adjustScore(other_sprite);
-                    sprite.visible = false;
-                    CamelGame.runner.shooting = false;
-                    other_sprite.visible=false;
-
-                    CamelGame.splashToast('В точку!!!', 1000);
-                    break;
-            }
-        },
-
-        adjustScore: function (otherSprite) {
-            if (otherSprite.score) {
-                CamelGame.score += Math.round(otherSprite.score * ((CamelGame.runner.spit.left - CamelGame.runner.spit.offset) / 500));
-                CamelGame.score = CamelGame.score < 0 ? 0 : CamelGame.score;
-                CamelGame.scoreElement.innerHTML = CamelGame.score;
-            }
-        }
-    }
-    // Sprites...........................................................
-
-    this.oases = [],
-    this.tourists = [],
-    this.bushes = [],
-    this.pyramids = [],
-    this.palms = [],
-
-    this.runner = new Sprite('runner',          // type
-        this.runnerArtist, // artist
-        [this.runBehavior, // behaviors
-            this.upBehavior,
-            this.downBehavior,
-            this.jumpBehavior,
-            this.ShootBehavior,
-            this.collideBehavior
-        ]);
-
-    // All sprites.......................................................
-    //
-    // (addSpritesToSpriteArray() adds sprites from the preceding sprite
-    // arrays to the sprites array)
-
-    this.sprites = [this.runner];
-};
+        this.sprites = [this.runner];
+    };
 
 
 // CamelGame.prototype ----------------------------------------------------
 
-CamelGame.prototype = {
+    CamelGame.prototype = {
 
-    setVisibilityToAllSprites: function () {
-        for (var i = 0; i < this.sprites.length; i++) {
-            if (this.sprites[i].type !== 'spit') 
-                this.sprites[i].visible = true;
-        }
-    }, 
-
-    setDefaultValues: function () {
-        this.score = this.prev_score;
-        this.runner.cells = this.camelCells;
-        this.spriteOffset = this.INITIAL_BACKGROUND_OFFSET;
-        this.backgroundOffset = this.INITIAL_BACKGROUND_OFFSET;
-        this.bgVelocity = this.INITIAL_BACKGROUND_VELOCITY;
-        this.healthProgressBar.adjustValue(100);
-        this.waterProgressBar.adjustValue(100);
-
-    },
-
-    updateSpritesTop: function (spritesData, spriteHeight) {
-        for (var i = 0; i < spritesData.length; ++i) {
-            spritesData[i].top -= spriteHeight;
-        }
-    },
-
-    generateLevel: function (levelNum) {
-        var oasesCount,
-            palmsCount,
-            pyramidsCount,
-            touristsCount,
-            bushesCount;
-
-        switch (levelNum) {
-            case 1: 
-                oasesCount = 1;
-                palmsCount = 2;
-                pyramidsCount = 0;
-                touristsCount = 2;
-                bushesCount = 0;
-                break;
-            case 2:
-                oasesCount = 2;
-                palmsCount = 4;
-                pyramidsCount = 3;
-                touristsCount = 4;
-                bushesCount = 2;
-                break;
-            case 3:
-                oasesCount = 3;
-                palmsCount = 10;
-                pyramidsCount = 8;
-                touristsCount = 12;
-                bushesCount = 5;
-                break;
-        }
-
-        var elementLength = 500;
-        var spritesCount = oasesCount + palmsCount + pyramidsCount + touristsCount + bushesCount;
-        this.LEVEL_END = (spritesCount + 2 ) * elementLength;
-        var spritesData = new Array();
-
-        //randomize all sprites position
-        for (var i = 0; i < spritesCount; i++) {
-            var spriteData = new Object();
-            spriteData.left = Math.random() * elementLength + elementLength * (i + 2);
-            var platformNum = Math.ceil( Math.random() * 3 );
-            spriteData.top = this.calculatePlatformTop( platformNum );
-            spritesData.push( spriteData );
-        }
-
-        var currentIndex = spritesData.length, temporaryValue, randomIndex ;
-
-        //shuffle all sprites
-        while (0 !== currentIndex) {
-            // Pick a remaining element...
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex -= 1;
-
-            // And swap it with the current element.
-            temporaryValue = spritesData[currentIndex];
-            spritesData[currentIndex] = spritesData[randomIndex];
-            spritesData[randomIndex] = temporaryValue;
-        }
-
-        //initialize sprites data
-        this.oasisData = spritesData.slice(0, oasesCount);
-        this.palmData = spritesData.slice(oasesCount, oasesCount + palmsCount);
-        this.pyramidData = spritesData.slice(oasesCount + palmsCount, oasesCount + palmsCount + pyramidsCount);
-        this.touristData = spritesData.slice(oasesCount + palmsCount + pyramidsCount, oasesCount + palmsCount + pyramidsCount + touristsCount);
-        this.bushData = spritesData.slice(oasesCount + palmsCount + pyramidsCount + touristsCount, oasesCount + palmsCount + pyramidsCount + touristsCount + bushesCount);
-        //update sprite top-position relatively to type
-        this.updateSpritesTop(this.oasisData, this.OASIS_HEIGHT);
-        this.updateSpritesTop(this.palmData, this.PALM_HEIGHT);
-        this.updateSpritesTop(this.pyramidData, this.PYRAMID_HEIGHT);
-        this.updateSpritesTop(this.touristData, this.TOURIST_HEIGHT);
-        this.updateSpritesTop(this.bushData, this.BUSH_HEIGHT);
-    },
-
-    // Drawing..............................................................
-
-    draw: function (now) {
-        this.setPlatformVelocity();
-        this.setTranslationOffsets();
-
-        this.drawBackground();
-        //sprites
-        this.updateSprites(now);
-        this.drawSprites();
-    },
-
-    setPlatformVelocity: function () {
-        this.platformVelocity = this.bgVelocity * 4.35;
-    },
-
-    setTranslationOffsets: function () {
-        this.setBackgroundTranslationOffset();
-        this.setSpriteTranslationOffsets();
-    },
-
-    setBackgroundTranslationOffset: function () {
-        var offset = this.backgroundOffset + this.bgVelocity / this.fps;
-
-        //if (offset > 0 && offset < this.background.width) {
-        if (offset > 0 && offset < this.canvas.clientWidth) {
-            this.backgroundOffset = offset;
-        }
-        else {
-            this.backgroundOffset = 0;
-        }
-    },
-
-    setSpriteTranslationOffsets: function () {
-        var i, sprite;
-
-        this.spriteOffset += this.platformVelocity / this.fps; // In step with platforms
-
-        for (i = 0; i < this.sprites.length; ++i) {
-            sprite = this.sprites[i];
-
-            if ('runner' !== sprite.type) {
-                sprite.offset = this.spriteOffset;
+        setVisibilityToAllSprites: function () {
+            for (var i = 0; i < this.sprites.length; i++) {
+                if (this.sprites[i].type !== 'spit')
+                    this.sprites[i].visible = true;
             }
-        }
-    },
+        },
 
-    drawBackground: function () {
-        this.context.save();
+        setDefaultValues: function () {
+            this.score = this.prev_score;
+            this.runner.cells = this.camelCells;
+            this.spriteOffset = this.INITIAL_BACKGROUND_OFFSET;
+            this.backgroundOffset = this.INITIAL_BACKGROUND_OFFSET;
+            this.bgVelocity = this.INITIAL_BACKGROUND_VELOCITY;
+            this.healthProgressBar.adjustValue(100);
+            this.waterProgressBar.adjustValue(100);
 
-        this.context.globalAlpha = 1.0;
-        this.context.translate(-this.backgroundOffset, 0);
+        },
 
-        // Initially onscreen:
-        //this.context.drawImage(this.background, 0, 0, this.background.width, this.background.height);
-        this.context.drawImage(this.background, 0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
+        updateSpritesTop: function (spritesData, spriteHeight) {
+            for (var i = 0; i < spritesData.length; ++i) {
+                spritesData[i].top -= spriteHeight;
+            }
+        },
 
-        // Initially offscreen:
-        //this.context.drawImage(this.background, this.background.width, 0, this.background.width+1, this.background.height);
-        this.context.drawImage(this.background, this.canvas.clientWidth, 0, this.canvas.clientWidth + 1, this.canvas.clientHeight);
+        generateLevel: function (levelNum) {
+            var oasesCount,
+                palmsCount,
+                pyramidsCount,
+                touristsCount,
+                bushesCount;
 
-        this.context.restore();
-    },
+            switch (levelNum) {
+                case 1:
+                    oasesCount = 1;
+                    palmsCount = 2;
+                    pyramidsCount = 0;
+                    touristsCount = 2;
+                    bushesCount = 0;
+                    break;
+                case 2:
+                    oasesCount = 2;
+                    palmsCount = 4;
+                    pyramidsCount = 3;
+                    touristsCount = 4;
+                    bushesCount = 2;
+                    break;
+                case 3:
+                    oasesCount = 3;
+                    palmsCount = 10;
+                    pyramidsCount = 8;
+                    touristsCount = 12;
+                    bushesCount = 5;
+                    break;
+            }
 
-    calculateFps: function (now) {
-        var fps;
+            var elementLength = 500;
+            var spritesCount = oasesCount + palmsCount + pyramidsCount + touristsCount + bushesCount;
+            this.LEVEL_END = (spritesCount + 2 ) * elementLength;
+            var spritesData = [];
 
-        if (this.lastAnimationFrameTime === 0) {
+            //randomize all sprites position
+            for (var i = 0; i < spritesCount; i++) {
+                var spriteData = {};
+                spriteData.left = Math.random() * elementLength + elementLength * (i + 2);
+                var platformNum = Math.ceil(Math.random() * 3);
+                spriteData.top = this.calculatePlatformTop(platformNum);
+                spritesData.push(spriteData);
+            }
+
+            var currentIndex = spritesData.length, temporaryValue, randomIndex;
+
+            //shuffle all sprites
+            while (0 !== currentIndex) {
+                // Pick a remaining element...
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+
+                // And swap it with the current element.
+                temporaryValue = spritesData[currentIndex];
+                spritesData[currentIndex] = spritesData[randomIndex];
+                spritesData[randomIndex] = temporaryValue;
+            }
+
+            //initialize sprites data
+            this.oasisData = spritesData.slice(0, oasesCount);
+            this.palmData = spritesData.slice(oasesCount, oasesCount + palmsCount);
+            this.pyramidData = spritesData.slice(oasesCount + palmsCount, oasesCount + palmsCount + pyramidsCount);
+            this.touristData = spritesData.slice(oasesCount + palmsCount + pyramidsCount, oasesCount + palmsCount + pyramidsCount + touristsCount);
+            this.bushData = spritesData.slice(oasesCount + palmsCount + pyramidsCount + touristsCount, oasesCount + palmsCount + pyramidsCount + touristsCount + bushesCount);
+            //update sprite top-position relatively to type
+            this.updateSpritesTop(this.oasisData, this.OASIS_HEIGHT);
+            this.updateSpritesTop(this.palmData, this.PALM_HEIGHT);
+            this.updateSpritesTop(this.pyramidData, this.PYRAMID_HEIGHT);
+            this.updateSpritesTop(this.touristData, this.TOURIST_HEIGHT);
+            this.updateSpritesTop(this.bushData, this.BUSH_HEIGHT);
+        },
+
+        // Drawing..............................................................
+
+        draw: function (now) {
+            this.setPlatformVelocity();
+            this.setTranslationOffsets();
+
+            this.drawBackground();
+            //sprites
+            this.updateSprites(now);
+            this.drawSprites();
+        },
+
+        setPlatformVelocity: function () {
+            this.platformVelocity = this.bgVelocity * 4.35;
+        },
+
+        setTranslationOffsets: function () {
+            this.setBackgroundTranslationOffset();
+            this.setSpriteTranslationOffsets();
+        },
+
+        setBackgroundTranslationOffset: function () {
+            var offset = this.backgroundOffset + this.bgVelocity / this.fps;
+
+            //if (offset > 0 && offset < this.background.width) {
+            if (offset > 0 && offset < this.canvas.clientWidth) {
+                this.backgroundOffset = offset;
+            }
+            else {
+                this.backgroundOffset = 0;
+            }
+        },
+
+        setSpriteTranslationOffsets: function () {
+            var i, sprite;
+
+            this.spriteOffset += this.platformVelocity / this.fps; // In step with platforms
+
+            for (i = 0; i < this.sprites.length; ++i) {
+                sprite = this.sprites[i];
+
+                if ('runner' !== sprite.type) {
+                    sprite.offset = this.spriteOffset;
+                }
+            }
+        },
+
+        drawBackground: function () {
+            this.context.save();
+
+            this.context.globalAlpha = 1.0;
+            this.context.translate(-this.backgroundOffset, 0);
+
+            // Initially onscreen:
+            //this.context.drawImage(this.background, 0, 0, this.background.width, this.background.height);
+            this.context.drawImage(this.background, 0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
+
+            // Initially offscreen:
+            //this.context.drawImage(this.background, this.background.width, 0, this.background.width+1, this.background.height);
+            this.context.drawImage(this.background, this.canvas.clientWidth, 0, this.canvas.clientWidth + 1, this.canvas.clientHeight);
+
+            this.context.restore();
+        },
+
+        calculateFps: function (now) {
+            var fps;
+
+            if (this.lastAnimationFrameTime === 0) {
+                this.lastAnimationFrameTime = now;
+                return 60;
+            }
+
+            fps = 2000 / (now - this.lastAnimationFrameTime);
             this.lastAnimationFrameTime = now;
-            return 60;
-        }
 
-        fps = 2000 / (now - this.lastAnimationFrameTime);
-        this.lastAnimationFrameTime = now;
+            if (now - this.lastFpsUpdateTime > 1000) {
+                this.lastFpsUpdateTime = now;
+                this.fpsElement.innerHTML = fps.toFixed(0) + ' fps';
+            }
 
-        if (now - this.lastFpsUpdateTime > 1000) {
-            this.lastFpsUpdateTime = now;
-            this.fpsElement.innerHTML = fps.toFixed(0) + ' fps';
-        }
+            return fps;
+        },
 
-        return fps;
-    },
+        calculatePlatformTop: function (track) {
+            var top;
 
-    calculatePlatformTop: function (track) {
-        var top;
+            if (track === 1) {
+                top = this.TRACK_1_BASELINE;
+            }
+            else if (track === 2) {
+                top = this.TRACK_2_BASELINE;
+            }
+            else if (track === 3) {
+                top = this.TRACK_3_BASELINE;
+            }
 
-        if (track === 1) {
-            top = this.TRACK_1_BASELINE;
-        }
-        else if (track === 2) {
-            top = this.TRACK_2_BASELINE;
-        }
-        else if (track === 3) {
-            top = this.TRACK_3_BASELINE;
-        }
+            return top;
+        },
 
-        return top;
-    },
+        turnRight: function () {
+            this.bgVelocity = this.BACKGROUND_VELOCITY;
+            this.runner.runAnimationRate = 10;
+            this.runnerArtist.cells = this.camelCells;
+            this.runner.direction = this.RIGHT;
+        },
 
-    turnRight: function () {
-        this.bgVelocity = this.BACKGROUND_VELOCITY;
-        this.runner.runAnimationRate = 10;
-        this.runnerArtist.cells = this.camelCells;
-        this.runner.direction = this.RIGHT;
-    },
+        // Sprites..............................................................
 
-    // Sprites..............................................................
+        increaseWater: function (sprite) {
+            sprite.visible = false;
+            this.waterProgressBar.adjustValue(sprite.value);
+        },
 
-    increaseWater: function (sprite) {
-        sprite.visible = false;
-        this.waterProgressBar.adjustValue(sprite.value);
-    },
+        decreaseWater: function (value) {
+            this.waterProgressBar.adjustValue(-value);
+        },
 
-    decreaseWater: function (value) {
-        this.waterProgressBar.adjustValue(-value);
-    },
+        nothingDuing: function (sprite) {
+            sprite.visible = false;
+            CamelGame.runner.shooting = false;
+        },
 
-    nothingDuing: function (sprite)
-    {
-        sprite.visible=false;
-        CamelGame.runner.shooting=false;
-    },
+        increaseHealth: function (sprite) {
+            sprite.visible = false;
+            this.healthProgressBar.adjustValue(sprite.value);
+        },
 
-    increaseHealth: function (sprite) {
-        sprite.visible = false;
-        this.healthProgressBar.adjustValue(sprite.value);
-    },
+        decreaseHealth: function (sprite) {
+            sprite.visible = false;
+            this.healthProgressBar.adjustValue(sprite.value);
+        },
 
-    decreaseHealth: function (sprite) {
-        sprite.visible = false;
-        this.healthProgressBar.adjustValue(sprite.value);
-    },
+        explode: function (sprite, silent) {
+            sprite.exploding = true;
+            this.explosionAnimator.start(sprite, true);  // true means sprite reappears
+        },
 
-    explode: function (sprite, silent) {
-        sprite.exploding = true;
-        this.explosionAnimator.start(sprite, true);  // true means sprite reappears
-    },
+        equipRunner: function () {
+            this.runner.runAnimationRate = 0,
+                this.runner.track = 1;
+            this.runner.direction = this.LEFT;
+            this.runner.velocityX = 0;
+            this.runner.width = this.CAMEL_WIDTH;
+            this.runner.height = this.CAMEL_HEIGHT;
+            this.runner.left = 50;
+            this.runner.top = this.calculatePlatformTop(this.runner.track) - this.CAMEL_CELLS_HEIGHT;
 
-    equipRunner: function () {
-        this.runner.runAnimationRate = 0,
-            this.runner.track = 1;
-        this.runner.direction = this.LEFT;
-        this.runner.velocityX = 0;
-        this.runner.width = this.CAMEL_WIDTH;
-        this.runner.height = this.CAMEL_HEIGHT;
-        this.runner.left = 50;
-        this.runner.top = this.calculatePlatformTop(this.runner.track) - this.CAMEL_CELLS_HEIGHT;
+            this.runner.artist.cells = this.camelCells;
 
-        this.runner.artist.cells = this.camelCells;
-
-        this.runner.changing_track = false;
-        this.runner.changing_track_down = false;
-        this.runner.jumping = false;
-        this.runner.falling = false;
-        this.runner.shooting = false;
+            this.runner.changing_track = false;
+            this.runner.changing_track_down = false;
+            this.runner.jumping = false;
+            this.runner.falling = false;
+            this.runner.shooting = false;
 
 
-        //spits
-        this.runner.spit = new Sprite('spit',
-            this.spitArtist,
-            [this.SpitMoveBehavior,
-            this.collideSpitBehavior]);
+            //spits
+            this.runner.spit = new Sprite('spit',
+                this.spitArtist,
+                [this.SpitMoveBehavior,
+                    this.collideSpitBehavior]);
 
-        this.runner.spit.width = CamelGame.SPIT_WIDTH;
-        this.runner.spit.height = CamelGame.SPIT_HEIGHT;
+            this.runner.spit.width = CamelGame.SPIT_WIDTH;
+            this.runner.spit.height = CamelGame.SPIT_HEIGHT;
 
-        this.runner.spit.top = this.runner.top + this.runner.spit.height / 2;
-        this.runner.spit.left = this.runner.left + this.runner.width + 5 + this.runner.spit.width / 2;
-        this.runner.spit.visible = false;
+            this.runner.spit.top = this.runner.top + this.runner.spit.height / 2;
+            this.runner.spit.left = this.runner.left + this.runner.width + 5 + this.runner.spit.width / 2;
+            this.runner.spit.visible = false;
 
-        this.runner.spit.runner = this.runner;  // runner spits maintain a reference to their runner
+            this.runner.spit.runner = this.runner;  // runner spits maintain a reference to their runner
 
-        this.sprites.push(this.runner.spit);
-        //spits end
-        this.runner.up = function () {
-            // this method is essentially a switch that turns
-            // on the runner's jumping behavior
+            this.sprites.push(this.runner.spit);
+            //spits end
+            this.runner.up = function () {
+                // this method is essentially a switch that turns
+                // on the runner's jumping behavior
 
-            this.changing_track = !this.changing_track // 'this' is the runner
-        };
+                this.changing_track = !this.changing_track; // 'this' is the runner
+            };
 
-        this.runner.down = function () {
-            // this method is essentially a switch that turns
-            // on the runner's falling behavior
+            this.runner.down = function () {
+                // this method is essentially a switch that turns
+                // on the runner's falling behavior
 
-            this.changing_track_down = !this.changing_track_down // 'this' is the runner
-        };
+                this.changing_track_down = !this.changing_track_down; // 'this' is the runner
+            };
 
-        this.equipRunnerForJumping();
-        this.equipRunnerForFalling();
-    },
+            this.equipRunnerForJumping();
+            this.equipRunnerForFalling();
+        },
 
-    equipRunnerForFalling: function () {
-        this.runner.falling = false;
-        this.runner.fallAnimationTimer = new AnimationTimer();
+        equipRunnerForFalling: function () {
+            this.runner.falling = false;
+            this.runner.fallAnimationTimer = new AnimationTimer();
 
-        this.runner.fall = function (initialVelocity) {
-            this.velocityY = initialVelocity || 0;
-            this.initialVelocityY = initialVelocity || 0;
-            this.fallAnimationTimer.start();
-            this.falling = true;
-        }
+            this.runner.fall = function (initialVelocity) {
+                this.velocityY = initialVelocity || 0;
+                this.initialVelocityY = initialVelocity || 0;
+                this.fallAnimationTimer.start();
+                this.falling = true;
+            };
 
-        this.runner.stopFalling = function () {
-            this.falling = false;
-            this.velocityY = 0;
-            this.fallAnimationTimer.stop();
-        }
-    },
+            this.runner.stopFalling = function () {
+                this.falling = false;
+                this.velocityY = 0;
+                this.fallAnimationTimer.stop();
+            }
+        },
 
-    equipRunnerForJumping: function () {
-        this.runner.JUMP_DURATION = 1000; // milliseconds
-        this.runner.JUMP_HEIGHT = 150;
+        equipRunnerForJumping: function () {
+            this.runner.JUMP_DURATION = 1000; // milliseconds
+            this.runner.JUMP_HEIGHT = 150;
 
-        this.runner.jumping = false;
+            this.runner.jumping = false;
 
-        this.runner.ascendAnimationTimer =
-            new AnimationTimer(this.runner.JUMP_DURATION / 2,
-                AnimationTimer.makeEaseOutTransducer(1.1));
+            this.runner.ascendAnimationTimer =
+                new AnimationTimer(this.runner.JUMP_DURATION / 2,
+                    AnimationTimer.makeEaseOutTransducer(1.1));
 
-        this.runner.descendAnimationTimer =
-            new AnimationTimer(this.runner.JUMP_DURATION / 2,
-                AnimationTimer.makeEaseInTransducer(1.1));
+            this.runner.descendAnimationTimer =
+                new AnimationTimer(this.runner.JUMP_DURATION / 2,
+                    AnimationTimer.makeEaseInTransducer(1.1));
 
-        this.runner.stopJumping = function () {
-            this.jumping = false;
-            this.ascendAnimationTimer.stop();
-            this.descendAnimationTimer.stop();
-            this.runAnimationRate = 10;
-        };
+            this.runner.stopJumping = function () {
+                this.jumping = false;
+                this.ascendAnimationTimer.stop();
+                this.descendAnimationTimer.stop();
+                this.runAnimationRate = 10;
+            };
 
-        this.runner.jump = function () {
-            if (this.jumping) // 'this' is the runner
-                return;
+            this.runner.jump = function () {
+                if (this.jumping) // 'this' is the runner
+                    return;
 
-            this.runAnimationRate = 0;
-            this.jumping = true;
-            this.verticalLaunchPosition = this.top;
-            this.ascendAnimationTimer.start();
-        };
+                this.runAnimationRate = 0;
+                this.jumping = true;
+                this.verticalLaunchPosition = this.top;
+                this.ascendAnimationTimer.start();
+            };
 
-        this.runner.shoot = function () {
-            if (this.shooting || CamelGame.waterProgressBar.getValue()<10) // 'this' is the runner
-                return;
-            this.shooting = true;
-        };
-    },
+            this.runner.shoot = function () {
+                if (this.shooting || CamelGame.waterProgressBar.getValue() < 10) // 'this' is the runner
+                    return;
+                this.shooting = true;
+            };
+        },
 
-    // Level statistics.....................................................
-    revealLevelStats: function() {
-        this.togglePaused();
-        this.levelStatsElement.style.display = 'block';
-        this.levelStatsScoreElement.innerHTML = this.score;
-    },
+        // Level statistics.....................................................
+        revealLevelStats: function () {
+            this.togglePaused();
+            this.levelStatsElement.style.display = 'block';
+            this.levelStatsScoreElement.innerHTML = this.score;
+        },
 
-    hideLevelStats: function() {
-        var STATS_REVEAL_DELAY = 1000;
-        CamelGame.levelStatsElement.style.display = 'none';
-        /*setTimeout( function (e) {
+        hideLevelStats: function () {
+            var STATS_REVEAL_DELAY = 1000;
             CamelGame.levelStatsElement.style.display = 'none';
-      }, this.STATS_REVEAL_DELAY);*/
-    },
-    // Toast................................................................
+            /*setTimeout( function (e) {
+             CamelGame.levelStatsElement.style.display = 'none';
+             }, this.STATS_REVEAL_DELAY);*/
+        },
+        // Toast................................................................
 
-    splashToast: function (text, howLong) {
-        howLong = howLong || this.DEFAULT_TOAST_TIME;
+        splashToast: function (text, howLong) {
+            howLong = howLong || this.DEFAULT_TOAST_TIME;
 
-        toast.style.display = 'block';
-        toast.innerHTML = text;
-
-        setTimeout(function (e) {
-            if (CamelGame.windowHasFocus) {
-                toast.style.opacity = 1.0; // After toast is displayed
-            }
-        }, 50);
-
-        setTimeout(function (e) {
-            if (CamelGame.windowHasFocus) {
-                toast.style.opacity = 0; // Starts CSS3 transition
-            }
+            toast.style.display = 'block';
+            toast.innerHTML = text;
 
             setTimeout(function (e) {
                 if (CamelGame.windowHasFocus) {
-                    toast.style.display = 'none';
+                    toast.style.opacity = 1.0; // After toast is displayed
                 }
-            }, 480);
-        }, howLong);
-    },
+            }, 50);
 
-    // Pause................................................................
+            setTimeout(function (e) {
+                if (CamelGame.windowHasFocus) {
+                    toast.style.opacity = 0; // Starts CSS3 transition
+                }
 
-    togglePaused: function () {
-        var now = +new Date();
+                setTimeout(function (e) {
+                    if (CamelGame.windowHasFocus) {
+                        toast.style.display = 'none';
+                    }
+                }, 480);
+            }, howLong);
+        },
 
-        this.paused = !this.paused;
+        // Pause................................................................
 
-        if (this.paused) {
-            this.pauseStartTime = now;
-        }
-        else {
-            this.lastAnimationFrameTime += (now - this.pauseStartTime);
-        }
-    },
+        togglePaused: function () {
+            var now = +new Date();
 
-    // Animation............................................................
+            this.paused = !this.paused;
 
-    animate: function (now) {
-        if (CamelGame.paused) {
-            setTimeout(function () {
+            if (this.paused) {
+                this.pauseStartTime = now;
+            }
+            else {
+                this.lastAnimationFrameTime += (now - this.pauseStartTime);
+            }
+        },
+
+        // Animation............................................................
+
+        animate: function (now) {
+            if (CamelGame.paused) {
+                setTimeout(function () {
+                    requestNextAnimationFrame(CamelGame.animate);
+                }, CamelGame.PAUSED_CHECK_INTERVAL);
+            }
+            else {
+                CamelGame.fps = CamelGame.calculateFps(now);
+                CamelGame.draw(now);
                 requestNextAnimationFrame(CamelGame.animate);
-            }, CamelGame.PAUSED_CHECK_INTERVAL);
-        }
-        else {
-            CamelGame.fps = CamelGame.calculateFps(now);
-            CamelGame.draw(now);
-            requestNextAnimationFrame(CamelGame.animate);
-            CamelGame.score_on_fps+=1;
-            if (CamelGame.score_on_fps%30==1) {
-                CamelGame.score+=1;
-                CamelGame.scoreElement.innerHTML = CamelGame.score;
-            }
-        }
-    },
-
-    // Levels functions.....................................................
-    nextLevel: function () {
-        this.prev_score = this.score;
-        this.hideLevelStats();
-        this.setDefaultValues();
-        this.LEVEL++;
-        /*setTimeout( function (e) {
-            CamelGame.revealLevelStats();
-        }, 2000); */
-        this.start();
-    },
-
-    restartLevel: function() {
-        this.insertIntoDataBase(this.player_name, this.score);
-        this.hideLevelStats();
-        this.setDefaultValues();
-        //this.start();
-
-
-        this.setVisibilityToAllSprites();
-        this.turnRight();
-        //this.start();
-    },
-
-    exitLevels: function (){
-        this.insertIntoDataBase(this.player_name, this.score);
-        this.hideLevelStats();
-
-        this.prev_score = 0;
-        this.score=0;
-        this.setDefaultValues();
-        this.LEVEL=1;
-        /*setTimeout( function (e) {
-         CamelGame.revealLevelStats();
-         }, 2000); */
-       // this.start();
-    },
-    // ------------------------- INITIALIZATION ----------------------------
-
-    start: function () {
-        this.generateLevel( this.LEVEL );
-        this.createSprites();
-        this.initializeImages();
-        this.equipRunner();
-
-        //DB
-        this.createOpenDataBase();
-        /*this.insertIntoDataBase(this.plyaer_name,this.score);
-        this.selectFromDataBase(); */
-
-        this.healthProgressBar.adjustValue();
-        this.waterProgressBar.adjustValue();
-        this.bgVelocity = this.BACKGROUND_VELOCITY;
-        CamelGame.splashToast('Good Luck!', 2000);
-
-        this.turnRight();
-        //requestNextAnimationFrame(CamelGame.animate);
-    },
-
-    initializeImages: function () {
-        CamelGame.scoreElement.innerHTML = CamelGame.score;
-        this.background.src = 'images/background-l1.png';
-        //this.spritesheet.src = 'images/sprite_camel_big.png';
-        this.spritesheet.src = 'images/sprite-sheet.png';
-        this.background.onload = function (e) {
-            CamelGame.startGame();
-        };
-    },
-
-    startGame: function () {
-        requestNextAnimationFrame(this.animate);
-    },
-
-    positionSprites: function (sprites, spriteData) {
-        var sprite;
-
-        for (var i = 0; i < spriteData.length; ++i) {
-            sprite = sprites[i];
-
-            sprite.top = spriteData[i].top;
-            sprite.left = spriteData[i].left;
-        }
-    },
-
-    updateSprites: function (now) {
-        var sprite;
-
-        for (var i = 0; i < this.sprites.length; ++i) {
-            sprite = this.sprites[i];
-
-            if (sprite.visible && this.spriteInView(sprite)) {
-                sprite.update(now, this.fps, this.context);
-            }
-        }
-    },
-
-    drawSprites: function () {
-        var sprite;
-
-        for (var i = 0; i < this.sprites.length; ++i) {
-            sprite = this.sprites[i];
-
-            if (sprite.visible && this.spriteInView(sprite)) {
-                this.context.translate(-sprite.offset, 0);
-
-                sprite.draw(this.context);
-
-                this.context.translate(sprite.offset, 0);
-
-                if (this.spriteOffset >= this.LEVEL_END) {
-                    this.revealLevelStats();
+                CamelGame.score_on_fps += 1;
+                if (CamelGame.score_on_fps % 30 == 1) {
+                    CamelGame.score += 1;
+                    CamelGame.scoreElement.innerHTML = CamelGame.score;
                 }
             }
-        }
-    },
+        },
 
-    spriteInView: function (sprite) {
-        return sprite === this.runner  ||// runner is always visible
-            (sprite.left + sprite.width > this.spriteOffset &&
-            sprite.left < this.spriteOffset + this.canvas.width);
-    },
+        // Levels functions.....................................................
+        nextLevel: function () {
+            this.prev_score = this.score;
+            this.hideLevelStats();
+            this.setDefaultValues();
+            this.LEVEL++;
+            /*setTimeout( function (e) {
+             CamelGame.revealLevelStats();
+             }, 2000); */
+            this.start();
+        },
 
-    createSprites: function () {
-        this.createOasisSprites();
-        this.createTouristSprites();
-        this.createPyramidSprites();
-        this.createBushSprites();
-        this.createPalmSprites();
+        restartLevel: function () {
+            this.insertIntoDataBase(this.player_name, this.score);
+            this.hideLevelStats();
+            this.setDefaultValues();
+            //this.start();
 
-        this.addSpritesToSpriteArray();
-        this.initializeSprites();
-    },
 
-    initializeSprites: function () {
-        for (var i = 0; i < CamelGame.sprites.length; ++i) {
-            CamelGame.sprites[i].offset = 0;
-        }
-        this.positionSprites(this.oases, this.oasisData);
-        this.positionSprites(this.tourists, this.touristData);
-        this.positionSprites(this.pyramids, this.pyramidData);
-        this.positionSprites(this.bushes, this.bushData);
-        this.positionSprites(this.palms, this.palmData);
-    },
+            this.setVisibilityToAllSprites();
+            this.turnRight();
+            //this.start();
+        },
 
-    addSpritesToSpriteArray: function () {
-        this.sprites = [ this.runner ];
-        for (var i = 0; i < this.oases.length; ++i) {
-            this.sprites.push(this.oases[i]);
-        }
-        for (var i = 0; i < this.tourists.length; ++i) {
-            this.sprites.push(this.tourists[i]);
-        }
-        ;
-        for (var i = 0; i < this.pyramids.length; ++i) {
-            this.sprites.push(this.pyramids[i]);
-        }
-        ;
-        for (var i = 0; i < this.bushes.length; ++i) {
-            this.sprites.push(this.bushes[i]);
-        }
-        ;
-        for (var i = 0; i < this.palms.length; ++i) {
-            this.sprites.push(this.palms[i]);
-        }
-        ;
-    },
+        exitLevels: function () {
+            this.insertIntoDataBase(this.player_name, this.score);
+            this.hideLevelStats();
 
-    createTouristSprites: function () {
-        var tourist,
-            touristArtist = new SpriteSheetArtist(this.spritesheet, this.touristCells);
+            this.prev_score = 0;
+            this.score = 0;
+            this.setDefaultValues();
+            this.LEVEL = 1;
+            /*setTimeout( function (e) {
+             CamelGame.revealLevelStats();
+             }, 2000); */
+            // this.start();
+        },
+        // ------------------------- INITIALIZATION ----------------------------
 
-        for (var i = 0; i < this.touristData.length; ++i) {
-            tourist = new Sprite('tourist', touristArtist);
+        start: function () {
+            this.generateLevel(this.LEVEL);
+            this.createSprites();
+            this.initializeImages();
+            this.equipRunner();
 
-            tourist.width = this.TOURIST_WIDTH;
-            tourist.height = this.TOURIST_HEIGHT;
+            //DB
+            this.createOpenDataBase();
+            /*this.insertIntoDataBase(this.plyaer_name,this.score);
+             this.selectFromDataBase(); */
 
-            tourist.value=-25;
-            tourist.score=45;
-            this.tourists.push(tourist);
-        }
-    },
+            this.healthProgressBar.adjustValue();
+            this.waterProgressBar.adjustValue();
+            this.bgVelocity = this.BACKGROUND_VELOCITY;
+            CamelGame.splashToast('Good Luck!', 2000);
 
-    createOasisSprites: function () {
-        var oasis,
-            oasisArtist = new SpriteSheetArtist(this.spritesheet, this.oasisCells);
+            this.turnRight();
+            //requestNextAnimationFrame(CamelGame.animate);
+        },
 
-        for (var i = 0; i < this.oasisData.length; ++i) {
-            oasis = new Sprite('oasis', oasisArtist);
+        initializeImages: function () {
+            CamelGame.scoreElement.innerHTML = CamelGame.score;
+            this.background.src = 'images/background-l1.png';
+            //this.spritesheet.src = 'images/sprite_camel_big.png';
+            this.spritesheet.src = 'images/sprite-sheet.png';
+            this.background.onload = function (e) {
+                CamelGame.startGame();
+            };
+        },
 
-            oasis.width = this.OASIS_WIDTH;
-            oasis.height = this.OASIS_HEIGHT;
+        startGame: function () {
+            requestNextAnimationFrame(this.animate);
+        },
 
-            oasis.value = 10;
+        positionSprites: function (sprites, spriteData) {
+            var sprite;
 
-            this.oases.push(oasis);
-        }
-    },
+            for (var i = 0; i < spriteData.length; ++i) {
+                sprite = sprites[i];
 
-    createPyramidSprites: function () {
-        var pyramid,
-            pyramidArtist = new SpriteSheetArtist(this.spritesheet, this.pyramidCells);
+                sprite.top = spriteData[i].top;
+                sprite.left = spriteData[i].left;
+            }
+        },
 
-        for (var i = 0; i < this.pyramidData.length; ++i) {
-            pyramid = new Sprite('pyramid', pyramidArtist);
+        updateSprites: function (now) {
+            var sprite;
 
-            pyramid.width = this.PYRAMID_WIDTH;
-            pyramid.height = this.PYRAMID_HEIGHT;
+            for (var i = 0; i < this.sprites.length; ++i) {
+                sprite = this.sprites[i];
 
-            pyramid.value = -20;
-
-            this.pyramids.push(pyramid);
-        }
-    },
-
-    createBushSprites: function () {
-        var bush,
-            bushArtist = new SpriteSheetArtist(this.spritesheet, this.bushCells);
-
-        for (var i = 0; i < this.bushData.length; ++i) {
-            bush = new Sprite('bush', bushArtist);
-
-            bush.width = this.BUSH_WIDTH;
-            bush.height = this.BUSH_HEIGHT;
-
-            bush.value = 10;
-
-            this.bushes.push(bush);
-        }
-    },
-
-    createPalmSprites: function () {
-        var palm,
-            palmArtist = new SpriteSheetArtist(this.spritesheet, this.palmCells);
-
-        for (var i = 0; i < this.palmData.length; ++i) {
-            palm = new Sprite('palm', palmArtist);
-
-            palm.width = this.PALM_WIDTH;
-            palm.height = this.PALM_HEIGHT;
-
-            palm.value = -15;
-
-            this.palms.push(palm);
-        }
-    },
-
-    createOpenDataBase: function () {
-        if (!CamelGame.dataBase) {
-            alert("Failed to connect to database.");
-        }
-        CamelGame.dataBase.transaction(function (tx) {
-            tx.executeSql('CREATE TABLE IF NOT EXISTS STATISTICS (ID INTEGER PRIMARY KEY ASC, NAME TEXT, SCORE INTEGER)');
-        });
-    },
-
-    insertIntoDataBase: function (player, score) {
-       var plr = "'"+player+"'";
-        CamelGame.dataBase.transaction(function (tx) {
-            tx.executeSql('INSERT INTO STATISTICS ' +
-            '(NAME,SCORE) VALUES (?, ?)',
-                [plr, score])
-        });
-    },
-
-    selectFromDataBase: function () {
-        var items = new Array();
-        CamelGame.dataBase.transaction(function (tx) {
-            tx.executeSql('SELECT * FROM STATISTICS ORDER BY SCORE DESC LIMIT 5', [], function (tx, results) {
-                var len = results.rows.length, i;
-                for (i = 0; i < len; i++) {
-                    items[i] = new Array(results.rows.item(i).NAME, results.rows.item(i).SCORE);
+                if (sprite.visible && this.spriteInView(sprite)) {
+                    sprite.update(now, this.fps, this.context);
                 }
+            }
+        },
 
-                var table = document.getElementById('statistics_table');
-                var i;
-                table.innerHTML = '';
+        drawSprites: function () {
+            var sprite;
 
-                for (i = 0; i < items.length; i++) {
-                    var tr = document.createElement('tr');
-                    tr.id = i.toString();
-                    var td1 = document.createElement('td');
-                    var td2 = document.createElement('td');
-                    table.appendChild(tr);
-                    td1.innerHTML = items[i][0];
-                    document.getElementById(i.toString()).appendChild(td1);
-                    td2.innerHTML = items[i][1];
-                    document.getElementById(i.toString()).appendChild(td2);
+            for (var i = 0; i < this.sprites.length; ++i) {
+                sprite = this.sprites[i];
+
+                if (sprite.visible && this.spriteInView(sprite)) {
+                    this.context.translate(-sprite.offset, 0);
+
+                    sprite.draw(this.context);
+
+                    this.context.translate(sprite.offset, 0);
+
+                    if (this.spriteOffset >= this.LEVEL_END) {
+                        this.revealLevelStats();
+                    }
                 }
-            }, null);
-        });
+            }
+        },
 
-    }
-};
+        spriteInView: function (sprite) {
+            return sprite === this.runner ||// runner is always visible
+                (sprite.left + sprite.width > this.spriteOffset &&
+                sprite.left < this.spriteOffset + this.canvas.width);
+        },
 
-var CamelGame = new CamelGame();
+        createSprites: function () {
+            this.createOasisSprites();
+            this.createTouristSprites();
+            this.createPyramidSprites();
+            this.createBushSprites();
+            this.createPalmSprites();
+
+            this.addSpritesToSpriteArray();
+            this.initializeSprites();
+        },
+
+        initializeSprites: function () {
+            for (var i = 0; i < CamelGame.sprites.length; ++i) {
+                CamelGame.sprites[i].offset = 0;
+            }
+            this.positionSprites(this.oases, this.oasisData);
+            this.positionSprites(this.tourists, this.touristData);
+            this.positionSprites(this.pyramids, this.pyramidData);
+            this.positionSprites(this.bushes, this.bushData);
+            this.positionSprites(this.palms, this.palmData);
+        },
+
+        addSpritesToSpriteArray: function () {
+            this.sprites = [this.runner];
+            for (var i = 0; i < this.oases.length; ++i) {
+                this.sprites.push(this.oases[i]);
+            }
+            for (var i = 0; i < this.tourists.length; ++i) {
+                this.sprites.push(this.tourists[i]);
+            }
+            for (var i = 0; i < this.pyramids.length; ++i) {
+                this.sprites.push(this.pyramids[i]);
+            }
+            for (var i = 0; i < this.bushes.length; ++i) {
+                this.sprites.push(this.bushes[i]);
+            }
+            for (var i = 0; i < this.palms.length; ++i) {
+                this.sprites.push(this.palms[i]);
+            }
+        },
+
+        createTouristSprites: function () {
+            var tourist,
+                touristArtist = new SpriteSheetArtist(this.spritesheet, this.touristCells);
+
+            for (var i = 0; i < this.touristData.length; ++i) {
+                tourist = new Sprite('tourist', touristArtist);
+
+                tourist.width = this.TOURIST_WIDTH;
+                tourist.height = this.TOURIST_HEIGHT;
+
+                tourist.value = -25;
+                tourist.score = 45;
+                this.tourists.push(tourist);
+            }
+        },
+
+        createOasisSprites: function () {
+            var oasis,
+                oasisArtist = new SpriteSheetArtist(this.spritesheet, this.oasisCells);
+
+            for (var i = 0; i < this.oasisData.length; ++i) {
+                oasis = new Sprite('oasis', oasisArtist);
+
+                oasis.width = this.OASIS_WIDTH;
+                oasis.height = this.OASIS_HEIGHT;
+
+                oasis.value = 10;
+
+                this.oases.push(oasis);
+            }
+        },
+
+        createPyramidSprites: function () {
+            var pyramid,
+                pyramidArtist = new SpriteSheetArtist(this.spritesheet, this.pyramidCells);
+
+            for (var i = 0; i < this.pyramidData.length; ++i) {
+                pyramid = new Sprite('pyramid', pyramidArtist);
+
+                pyramid.width = this.PYRAMID_WIDTH;
+                pyramid.height = this.PYRAMID_HEIGHT;
+
+                pyramid.value = -20;
+
+                this.pyramids.push(pyramid);
+            }
+        },
+
+        createBushSprites: function () {
+            var bush,
+                bushArtist = new SpriteSheetArtist(this.spritesheet, this.bushCells);
+
+            for (var i = 0; i < this.bushData.length; ++i) {
+                bush = new Sprite('bush', bushArtist);
+
+                bush.width = this.BUSH_WIDTH;
+                bush.height = this.BUSH_HEIGHT;
+
+                bush.value = 10;
+
+                this.bushes.push(bush);
+            }
+        },
+
+        createPalmSprites: function () {
+            var palm,
+                palmArtist = new SpriteSheetArtist(this.spritesheet, this.palmCells);
+
+            for (var i = 0; i < this.palmData.length; ++i) {
+                palm = new Sprite('palm', palmArtist);
+
+                palm.width = this.PALM_WIDTH;
+                palm.height = this.PALM_HEIGHT;
+
+                palm.value = -15;
+
+                this.palms.push(palm);
+            }
+        },
+
+        createOpenDataBase: function () {
+            if (!CamelGame.dataBase) {
+                alert("Failed to connect to database.");
+            }
+            CamelGame.dataBase.transaction(function (tx) {
+                tx.executeSql('CREATE TABLE IF NOT EXISTS STATISTICS (ID INTEGER PRIMARY KEY ASC, NAME TEXT, SCORE INTEGER)');
+            });
+        },
+
+        insertIntoDataBase: function (player, score) {
+            var plr = "'" + player + "'";
+            CamelGame.dataBase.transaction(function (tx) {
+                tx.executeSql('INSERT INTO STATISTICS ' +
+                    '(NAME,SCORE) VALUES (?, ?)',
+                    [plr, score])
+            });
+        },
+
+        selectFromDataBase: function () {
+            var items = [];
+            CamelGame.dataBase.transaction(function (tx) {
+                tx.executeSql('SELECT * FROM STATISTICS ORDER BY SCORE DESC LIMIT 5', [], function (tx, results) {
+                    var len = results.rows.length, i;
+                    for (i = 0; i < len; i++) {
+                        items[i] = [results.rows.item(i).NAME, results.rows.item(i).SCORE];
+                    }
+
+                    var table = document.getElementById('statistics_table');
+                    var i;
+                    table.innerHTML = '';
+
+                    for (i = 0; i < items.length; i++) {
+                        var tr = document.createElement('tr');
+                        tr.id = i.toString();
+                        var td1 = document.createElement('td');
+                        var td2 = document.createElement('td');
+                        table.appendChild(tr);
+                        td1.innerHTML = items[i][0];
+                        document.getElementById(i.toString()).appendChild(td1);
+                        td2.innerHTML = items[i][1];
+                        document.getElementById(i.toString()).appendChild(td2);
+                    }
+                }, null);
+            });
+
+        }
+    };
+
+    var CamelGame = new CamelGame();
 
 // Event handlers.......................................................
 
 //touch on canvas - camel must change track
-document.getElementById('game-canvas').addEventListener("touchstart", function (e) {
-    var touch = e.touches[0];
-    var trackHeight = CamelGame.canvas.height / 4;
-    var trackNum = 4 - parseInt(touch.pageY / trackHeight);
-    if (trackNum > CamelGame.runnerTrack) {
-        CamelGame.runner.up();
-        CamelGame.runnerTrack++;
-    }
-    else if (trackNum < CamelGame.runnerTrack) {
-        CamelGame.runner.down();
-        CamelGame.runnerTrack--;
-    }
-}, false);
+    document.getElementById('game-canvas').addEventListener("touchstart", function (e) {
+        var touch = e.touches[0];
+        var trackHeight = CamelGame.canvas.height / 4;
+        var trackNum = 4 - parseInt(touch.pageY / trackHeight);
+        if (trackNum > CamelGame.runnerTrack) {
+            CamelGame.runner.up();
+            CamelGame.runnerTrack++;
+        }
+        else if (trackNum < CamelGame.runnerTrack) {
+            CamelGame.runner.down();
+            CamelGame.runnerTrack--;
+        }
+    }, false);
 
 //touch on jump
-document.getElementById('jumpButton').addEventListener("touchstart", function (e) {
-    var touch = e.touches[0];
-    CamelGame.runner.jump();
-}, false);
+    document.getElementById('jumpButton').addEventListener("touchstart", function (e) {
+        var touch = e.touches[0];
+        CamelGame.runner.jump();
+    }, false);
 
 //touch on spit
-document.getElementById('spitButton').addEventListener("touchstart", function (e) {
-    var touch = e.touches[0];
-    if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
-        CamelGame.runner.shoot();
-    }
-}, false);
-
-
-window.onkeydown = function (e) {
-    var key = e.keyCode;
-
-    if (key === 80 || (CamelGame.paused && key !== 80)) {  // 'p'
-        CamelGame.togglePaused();
-    }
-
-    else if (key === 74 || key === 38 || key===87) { // 'j or Up or w'
-        if (CamelGame.runnerTrack === 3) {
-            return;
-        }
-        CamelGame.runner.up();
-        CamelGame.runnerTrack++;
-    }
-    else if (key === 70 || key===40 || key===83) { // 'f or Down or s'
-        if (CamelGame.runnerTrack === 1) {
-            return;
-        }
-        CamelGame.runner.down();
-        CamelGame.runnerTrack--;
-    }
-    else if (key === 32) { // 'space'
-        if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
-            CamelGame.runner.jump();
-        }
-    }
-    else if (key === 13) { // 'enter'
+    document.getElementById('spitButton').addEventListener("touchstart", function (e) {
+        var touch = e.touches[0];
         if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
             CamelGame.runner.shoot();
         }
+    }, false);
+
+
+    window.onkeydown = function (e) {
+        var key = e.keyCode;
+
+        if (key === 80 || (CamelGame.paused && key !== 80)) {  // 'p'
+            CamelGame.togglePaused();
+        }
+
+        else if (key === 74 || key === 38 || key === 87) { // 'j or Up or w'
+            if (CamelGame.runnerTrack === 3) {
+                return;
+            }
+            CamelGame.runner.up();
+            CamelGame.runnerTrack++;
+        }
+        else if (key === 70 || key === 40 || key === 83) { // 'f or Down or s'
+            if (CamelGame.runnerTrack === 1) {
+                return;
+            }
+            CamelGame.runner.down();
+            CamelGame.runnerTrack--;
+        }
+        else if (key === 32) { // 'space'
+            if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
+                CamelGame.runner.jump();
+            }
+        }
+        else if (key === 13) { // 'enter'
+            if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
+                CamelGame.runner.shoot();
+            }
+        }
+    };
+
+    window.onresize = function (e) { // change canvas size when window resize
+        CamelGame.canvas.width = window.innerWidth;
+        CamelGame.canvas.height = window.innerHeight;
+    };
+
+    window.onblur = stopgame; // pause if unpaused
+
+    function stopgame() {
+        CamelGame.windowHasFocus = false;
+
+        if (!CamelGame.paused) {
+            CamelGame.togglePaused();
+        }
     }
-}
 
-window.onresize = function (e) { // change canvas size when window resize
-    CamelGame.canvas.width = window.innerWidth;
-    CamelGame.canvas.height = window.innerHeight;
-}
+    window.onfocus = countdown;  // unpause if paused
 
-window.onblur = stopgame; // pause if unpaused
+    function countdown() {
+        var originalFont = CamelGame.toast.style.fontSize;
 
-function stopgame(){
-    CamelGame.windowHasFocus = false;
+        CamelGame.windowHasFocus = true;
 
-    if (!CamelGame.paused) {
-        CamelGame.togglePaused();
-    }
-}
+        if (CamelGame.paused) {
+            CamelGame.toast.style.font = '128px fantasy';
 
-window.onfocus = countdown;  // unpause if paused
-
-function countdown(){
-    var originalFont = CamelGame.toast.style.fontSize;
-
-    CamelGame.windowHasFocus = true;
-
-    if (CamelGame.paused) {
-        CamelGame.toast.style.font = '128px fantasy';
-
-        CamelGame.splashToast('3', 500); // Display 3 for one half second
-
-        setTimeout(function () {
-            CamelGame.splashToast('2', 500); // Display 2 for one half second
+            CamelGame.splashToast('3', 500); // Display 3 for one half second
 
             setTimeout(function () {
-                CamelGame.splashToast('1', 500); // Display 1 for one half second
+                CamelGame.splashToast('2', 500); // Display 2 for one half second
 
                 setTimeout(function () {
-                    if (CamelGame.windowHasFocus) {
-                        CamelGame.togglePaused();
-                    }
+                    CamelGame.splashToast('1', 500); // Display 1 for one half second
 
-                    setTimeout(function () { // Wait for '1' to disappear
-                        CamelGame.toast.style.fontSize = originalFont;
-                    }, 2000);
+                    setTimeout(function () {
+                        if (CamelGame.windowHasFocus) {
+                            CamelGame.togglePaused();
+                        }
+
+                        setTimeout(function () { // Wait for '1' to disappear
+                            CamelGame.toast.style.fontSize = originalFont;
+                        }, 2000);
+                    }, 1000);
                 }, 1000);
             }, 1000);
-        }, 1000);
+        }
     }
-}
 
 // start
-$('#start_btn').click(function () {
-    $('.start_wr').fadeOut(500, function(){
-        countdown();
-        CamelGame.start();
-        $('#continue_btn').css('display', 'block');
+    $('#start_btn').click(function () {
+        $('.start_wr').fadeOut(500, function () {
+            countdown();
+            CamelGame.start();
+            $('#continue_btn').css('display', 'block');
+        });
     });
-});
 
 //statistics
 
-$('#statistics_btn').click(function () {
-    $('.statistics').fadeIn(500, function () {
-      CamelGame.selectFromDataBase();
+    $('#statistics_btn').click(function () {
+        $('.statistics').fadeIn(500, function () {
+            CamelGame.selectFromDataBase();
+        });
     });
-});
 
-$('#go_menu_btn').click(function () {
-    $('.statistics').fadeOut(500);
-});
+    $('#go_menu_btn').click(function () {
+        $('.statistics').fadeOut(500);
+    });
 
 // exit
-$('#exit_btn').click(function(){
-    navigator.app.exitApp();
-});
+    $('#exit_btn').click(function () {
+        navigator.app.exitApp();
+    });
 
 // settings dropdown
-$('#settings_btn').click(function () {
-    if ($(this).hasClass('opened')) {
-        $(this).removeClass('opened');
-    } else {
-        $(this).addClass('opened');
-    }
-    $('.settings_wr').slideToggle();
-});
+    $('#settings_btn').click(function () {
+        if ($(this).hasClass('opened')) {
+            $(this).removeClass('opened');
+        } else {
+            $(this).addClass('opened');
+        }
+        $('.settings_wr').slideToggle();
+    });
 
-var ismuted = true;
-$(window).blur(function () {
-    document.getElementById('audio_back').pause();
-});
-$(window).focus(function () {
-    if (!ismuted) {
-        document.getElementById('audio_back').play();
-    }
-});
+    var ismuted = true;
+    $(window).blur(function () {
+        document.getElementById('audio_back').pause();
+    });
+    $(window).focus(function () {
+        if (!ismuted) {
+            document.getElementById('audio_back').play();
+        }
+    });
 
 // music btn
-$('#sound_yes').click(function(){
-    playSound('back');
-    $('.sound_settings_wr').fadeOut(400);
-    $('#music_btn').removeClass('sound_btn_off');
-    $('#sounds_btn').removeClass('sound_btn_off');
-});
-$('#sound_no').click(function(){
-    $('.sound_settings_wr').fadeOut(400);
-});
-
-var musicBtnClick = function(th){
-    if ($(th).hasClass('sound_btn_off')) {
-        $(th).removeClass('sound_btn_off');
-        document.getElementById('audio_back').muted = false;
-        document.getElementById('audio_back').play();
-        ismuted = false;
-    } else {
-        $(th).addClass('sound_btn_off');
-        document.getElementById('audio_back').muted = true;
-        document.getElementById('audio_back').pause();
-        ismuted = true;
-    }
-}
-$('#music_btn').click(function () {
-    musicBtnClick($(this));
-});    
-
-$('#sounds_btn').click(function () {
-    if ($(this).hasClass('sound_btn_off')) {
-        $(this).removeClass('sound_btn_off');
-    } else {
-        $(this).addClass('sound_btn_off');
-    }
-});
-
-function playSound(soundType) {
-    if (soundType === "back"){
-        ismuted = false;
-
-        audio = document.createElement("audio");
-        audio.setAttribute("id", "audio_back");
-        audio.setAttribute("loop", "true");
-        audio.volume = 0.15;
-
-        var mp3 = document.createElement("source");
-        mp3.setAttribute("src", "audio/back.mp3");
-        mp3.setAttribute("type", "audio/mpeg");
-        audio.appendChild(mp3);
-
-        var ogg = document.createElement("source");
-        ogg.setAttribute("src", "audio/back.ogg");
-        ogg.setAttribute("type", "audio/ogg");
-        audio.appendChild(ogg);
-
-        audio.play();
-        document.body.appendChild(audio);
-    }
-};
-
-$('#continue_btn').click(function(){
-    $('.start_wr').fadeOut(500, function(){
-        countdown();
-        CamelGame.start();
+    $('#sound_yes').click(function () {
+        playSound('back');
+        $('.sound_settings_wr').fadeOut(400);
+        $('#music_btn').removeClass('sound_btn_off');
+        $('#sounds_btn').removeClass('sound_btn_off');
     });
-});
+    $('#sound_no').click(function () {
+        $('.sound_settings_wr').fadeOut(400);
+    });
+
+    var musicBtnClick = function (th) {
+        if ($(th).hasClass('sound_btn_off')) {
+            $(th).removeClass('sound_btn_off');
+            document.getElementById('audio_back').muted = false;
+            document.getElementById('audio_back').play();
+            ismuted = false;
+        } else {
+            $(th).addClass('sound_btn_off');
+            document.getElementById('audio_back').muted = true;
+            document.getElementById('audio_back').pause();
+            ismuted = true;
+        }
+    };
+    $('#music_btn').click(function () {
+        musicBtnClick($(this));
+    });
+
+    $('#sounds_btn').click(function () {
+        if ($(this).hasClass('sound_btn_off')) {
+            $(this).removeClass('sound_btn_off');
+        } else {
+            $(this).addClass('sound_btn_off');
+        }
+    });
+
+    function playSound(soundType) {
+        if (soundType === "back") {
+            ismuted = false;
+
+            audio = document.createElement("audio");
+            audio.setAttribute("id", "audio_back");
+            audio.setAttribute("loop", "true");
+            audio.volume = 0.15;
+
+            var mp3 = document.createElement("source");
+            mp3.setAttribute("src", "audio/back.mp3");
+            mp3.setAttribute("type", "audio/mpeg");
+            audio.appendChild(mp3);
+
+            var ogg = document.createElement("source");
+            ogg.setAttribute("src", "audio/back.ogg");
+            ogg.setAttribute("type", "audio/ogg");
+            audio.appendChild(ogg);
+
+            audio.play();
+            document.body.appendChild(audio);
+        }
+    }
+    $('#continue_btn').click(function () {
+        $('.start_wr').fadeOut(500, function () {
+            countdown();
+            CamelGame.start();
+        });
+    });
 
 // pressing buttons on phone
-document.addEventListener("deviceready", function () {
-    document.addEventListener("menubutton", function(){
-        stopgame();
-        $('.start_wr').fadeIn(300);
+    document.addEventListener("deviceready", function () {
+        document.addEventListener("menubutton", function () {
+            stopgame();
+            $('.start_wr').fadeIn(300);
+        }, false);
+        document.addEventListener("backbutton", function () {
+            e.preventDefault();
+        }, false);
+        document.addEventListener("volumedownbutton", function () {
+            audio.volume--;
+        }, false);
+        document.addEventListener("volumeupbutton", function () {
+            audio.volume++;
+        }, false);
     }, false);
-    document.addEventListener("backbutton", function(){
-        e.preventDefault();
-    }, false);
-    document.addEventListener("volumedownbutton", function (){
-        audio.volume--;
-    },false);
-    document.addEventListener("volumeupbutton", function (){
-        audio.volume++;
-    }, false);
-}, false);
 
 // buttons on level statistics elements
-document.getElementById("restart-level-btn").addEventListener("click", function (e) {
-    CamelGame.togglePaused();
-    CamelGame.restartLevel();
-}, false);
+    document.getElementById("restart-level-btn").addEventListener("click", function (e) {
+        CamelGame.togglePaused();
+        CamelGame.restartLevel();
+    }, false);
 
-document.getElementById("next-level-btn").addEventListener("click", function (e) {
-    CamelGame.togglePaused();
-    CamelGame.nextLevel();
-}, false);
+    document.getElementById("next-level-btn").addEventListener("click", function (e) {
+        CamelGame.togglePaused();
+        CamelGame.nextLevel();
+    }, false);
 
-document.getElementById("to-menu-btn").addEventListener("click", function (e) {
-    CamelGame.exitLevels();
-    $('.start_wr').fadeIn(500, function(){
-        }
-    );
-}, false);
+    document.getElementById("to-menu-btn").addEventListener("click", function (e) {
+        CamelGame.exitLevels();
+        $('.start_wr').fadeIn(500, function () {
+            }
+        );
+    }, false);
 
 });
 
