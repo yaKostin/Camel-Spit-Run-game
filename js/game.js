@@ -22,7 +22,8 @@ var CamelGame = function () {
     this.LEFT = 1,
     this.RIGHT = 2,
     this.STATIONARY = 3,
-    this.LEVEL_END, 
+    this.LEVEL_END;
+    this.GAME_SPEED=2000;
 
     // Constants are listed in alphabetical order from here on out
 
@@ -763,23 +764,23 @@ CamelGame.prototype = {
         switch (levelNum) {
             case 1: 
                 oasesCount = 1;
-                palmsCount = 2;
+                palmsCount = 3;
                 pyramidsCount = 0;
                 touristsCount = 2;
-                bushesCount = 0;
-                break;
-            case 2:
-                oasesCount = 2;
-                palmsCount = 4;
-                pyramidsCount = 3;
-                touristsCount = 4;
                 bushesCount = 2;
                 break;
-            case 3:
-                oasesCount = 3;
+            case 2:
+                oasesCount = 4;
                 palmsCount = 10;
-                pyramidsCount = 8;
-                touristsCount = 12;
+                pyramidsCount = 6;
+                touristsCount = 7;
+                bushesCount = 3;
+                break;
+            case 3:
+                oasesCount = 10;
+                palmsCount = 17;
+                pyramidsCount = 12;
+                touristsCount = 20;
                 bushesCount = 5;
                 break;
         }
@@ -898,7 +899,7 @@ CamelGame.prototype = {
             return 60;
         }
 
-        fps = 2000 / (now - this.lastAnimationFrameTime);
+        fps = CamelGame.GAME_SPEED / (now - this.lastAnimationFrameTime);
         this.lastAnimationFrameTime = now;
 
         if (now - this.lastFpsUpdateTime > 1000) {
@@ -1156,6 +1157,7 @@ CamelGame.prototype = {
         this.hideLevelStats();
         this.setDefaultValues();
         this.LEVEL++;
+        this.GAME_SPEED=this.GAME_SPEED-500;
         /*setTimeout( function (e) {
             CamelGame.revealLevelStats();
         }, 2000); */
