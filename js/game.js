@@ -1647,23 +1647,28 @@ function playSound(soundType) {
     if (soundType === "back"){
         ismuted = false;
 
-        audio = document.createElement("audio");
-        audio.setAttribute("id", "audio_back");
-        audio.setAttribute("loop", "true");
-        audio.volume = 0.15;
+        // audio = document.createElement("audio");
+        // audio.setAttribute("id", "audio_back");
+        // audio.setAttribute("loop", "true");
+        // audio.volume = 0.15;
 
-        var mp3 = document.createElement("source");
-        mp3.setAttribute("src", "audio/back.mp3");
-        mp3.setAttribute("type", "audio/mpeg");
-        audio.appendChild(mp3);
+        // var mp3 = document.createElement("source");
+        // mp3.setAttribute("src", "audio/back.mp3");
+        // mp3.setAttribute("type", "audio/mpeg");
+        // audio.appendChild(mp3);
 
-        var ogg = document.createElement("source");
-        ogg.setAttribute("src", "audio/back.ogg");
-        ogg.setAttribute("type", "audio/ogg");
-        audio.appendChild(ogg);
+        // var ogg = document.createElement("source");
+        // ogg.setAttribute("src", "audio/back.ogg");
+        // ogg.setAttribute("type", "audio/ogg");
+        // audio.appendChild(ogg);
 
-        audio.play();
-        document.body.appendChild(audio);
+        // audio.play();
+        // document.body.appendChild(audio);
+
+        var sound = new Audio();
+        sound.src = "audio/back.mp3";
+        sound.play();
+        sound.volume = 0.15;
     }
 };
 
