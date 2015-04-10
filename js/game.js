@@ -14,16 +14,12 @@ var CamelGame = function () {
     this.scoreElement = document.getElementById('score_element'),
     this.healthProgressBar = new ProgressBar('#health'),
     this.waterProgressBar = new ProgressBar('#water'),
-    this.levelStatsElement = document.getElementById("level-stats"),
-    this.levelStatsScoreElement = document.getElementById("level-stats-score"),
+
     // Constants............................................................
 
-    this.LEVEL = 1,
     this.LEFT = 1,
     this.RIGHT = 2,
     this.STATIONARY = 3,
-    this.LEVEL_END;
-    this.GAME_SPEED=2000;
 
     // Constants are listed in alphabetical order from here on out
 
@@ -131,10 +127,9 @@ var CamelGame = function () {
     this.bgVelocity = this.STARTING_BACKGROUND_VELOCITY;
 
     // Statistics
-    this.prev_score = 0; 
-    this.score = 0;
-    this.score_on_fps = 0;
-    this.player_name = location.search.substring(1);
+    this.score=100;
+    this.score_on_fps=0;
+    this.plyaer_name=location.search.substring(1);
     this.dataBase = openDatabase('CamelDB', '1.0', 'Data Base for statistics', 10 * 1024);
 
 // Sprite artists...................................................
@@ -579,21 +574,30 @@ var CamelGame = function () {
 
                 switch (sprite.type) {
                     case 'bush':
-                        CamelGame.increaseHealth(sprite);
+                        CamelGame.increaseHealth(sprite);					
                         break;
                     case 'oasis':
                         CamelGame.increaseWater(sprite);
                         break;
                     case 'palm':
                         CamelGame.decreaseHealth(sprite);
+						var audio=new Audio ();
+                        audio.src='audio/udar.ogg';
+                        audio.autoplay=true;
                         break;
                     case 'pyramid':
                         CamelGame.decreaseHealth(sprite);
+						var audio=new Audio ();
+                        audio.src='audio/udar.ogg';
+                        audio.autoplay=true;
                         break;
                     case 'tourist':
                         CamelGame.decreaseHealth(sprite);
                         this.adjustScore(sprite)
                         CamelGame.splashToast('Попал в кадр!', 1000);
+						var audio=new Audio ();
+                        audio.src='audio/foto.mp3';
+                        audio.autoplay=true;
                         break;
                 }
             },
@@ -671,21 +675,32 @@ var CamelGame = function () {
             switch (other_sprite.type) {
                 case 'bush':
                     CamelGame.nothingDuing(sprite);
+					var audio=new Audio ();
+                    audio.src='audio/pl_stolkn.mp3';
+                    audio.autoplay=true;
                     break;
                 case 'oasis':
                     break;
                 case 'palm':
                     CamelGame.nothingDuing(sprite);
+					var audio=new Audio ();
+                    audio.src='audio/pl_stolkn.mp3';
+                    audio.autoplay=true;
                     break;
                 case 'pyramid':
                     CamelGame.nothingDuing(sprite);
+					var audio=new Audio ();
+                    audio.src='audio/pl_stolkn.mp3';
+                    audio.autoplay=true;
                     break;
                 case 'tourist':
                     this.adjustScore(other_sprite);
                     sprite.visible = false;
                     CamelGame.runner.shooting = false;
                     other_sprite.visible=false;
-
+                    var audio=new Audio ();
+                    audio.src='audio/smeh.mp3';
+                    audio.autoplay=true;
                     CamelGame.splashToast('В точку!!!', 1000);
                     break;
             }
@@ -702,20 +717,20 @@ var CamelGame = function () {
     // Sprites...........................................................
 
     this.oases = [],
-    this.tourists = [],
-    this.bushes = [],
-    this.pyramids = [],
-    this.palms = [],
+        this.tourists = [],
+        this.bushes = [],
+        this.pyramids = [],
+        this.palms = [],
 
-    this.runner = new Sprite('runner',          // type
-        this.runnerArtist, // artist
-        [this.runBehavior, // behaviors
-            this.upBehavior,
-            this.downBehavior,
-            this.jumpBehavior,
-            this.ShootBehavior,
-            this.collideBehavior
-        ]);
+        this.runner = new Sprite('runner',          // type
+            this.runnerArtist, // artist
+            [this.runBehavior, // behaviors
+                this.upBehavior,
+                this.downBehavior,
+                this.jumpBehavior,
+                this.ShootBehavior,
+                this.collideBehavior
+            ]);
 
     // All sprites.......................................................
     //
@@ -729,104 +744,6 @@ var CamelGame = function () {
 // CamelGame.prototype ----------------------------------------------------
 
 CamelGame.prototype = {
-
-    setVisibilityToAllSprites: function () {
-        for (var i = 0; i < this.sprites.length; i++) {
-            if (this.sprites[i].type !== 'spit') 
-                this.sprites[i].visible = true;
-        }
-    }, 
-
-    setDefaultValues: function () {
-        this.score = this.prev_score;
-        this.runner.cells = this.camelCells;
-        this.spriteOffset = this.INITIAL_BACKGROUND_OFFSET;
-        this.backgroundOffset = this.INITIAL_BACKGROUND_OFFSET;
-        this.bgVelocity = this.INITIAL_BACKGROUND_VELOCITY;
-        this.healthProgressBar.adjustValue(100);
-        this.waterProgressBar.adjustValue(100);
-
-    },
-
-    updateSpritesTop: function (spritesData, spriteHeight) {
-        for (var i = 0; i < spritesData.length; ++i) {
-            spritesData[i].top -= spriteHeight;
-        }
-    },
-
-    generateLevel: function (levelNum) {
-        var oasesCount,
-            palmsCount,
-            pyramidsCount,
-            touristsCount,
-            bushesCount;
-
-        switch (levelNum) {
-            case 1: 
-                oasesCount = 1;
-                palmsCount = 3;
-                pyramidsCount = 0;
-                touristsCount = 2;
-                bushesCount = 2;
-                break;
-            case 2:
-                oasesCount = 4;
-                palmsCount = 10;
-                pyramidsCount = 6;
-                touristsCount = 7;
-                bushesCount = 3;
-                break;
-            case 3:
-                oasesCount = 10;
-                palmsCount = 17;
-                pyramidsCount = 12;
-                touristsCount = 20;
-                bushesCount = 5;
-                break;
-        }
-
-        var elementLength = 500;
-        var spritesCount = oasesCount + palmsCount + pyramidsCount + touristsCount + bushesCount;
-        this.LEVEL_END = (spritesCount + 2 ) * elementLength;
-        var spritesData = new Array();
-
-        //randomize all sprites position
-        for (var i = 0; i < spritesCount; i++) {
-            var spriteData = new Object();
-            spriteData.left = Math.random() * elementLength + elementLength * (i + 2);
-            var platformNum = Math.ceil( Math.random() * 3 );
-            spriteData.top = this.calculatePlatformTop( platformNum );
-            spritesData.push( spriteData );
-        }
-
-        var currentIndex = spritesData.length, temporaryValue, randomIndex ;
-
-        //shuffle all sprites
-        while (0 !== currentIndex) {
-            // Pick a remaining element...
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex -= 1;
-
-            // And swap it with the current element.
-            temporaryValue = spritesData[currentIndex];
-            spritesData[currentIndex] = spritesData[randomIndex];
-            spritesData[randomIndex] = temporaryValue;
-        }
-
-        //initialize sprites data
-        this.oasisData = spritesData.slice(0, oasesCount);
-        this.palmData = spritesData.slice(oasesCount, oasesCount + palmsCount);
-        this.pyramidData = spritesData.slice(oasesCount + palmsCount, oasesCount + palmsCount + pyramidsCount);
-        this.touristData = spritesData.slice(oasesCount + palmsCount + pyramidsCount, oasesCount + palmsCount + pyramidsCount + touristsCount);
-        this.bushData = spritesData.slice(oasesCount + palmsCount + pyramidsCount + touristsCount, oasesCount + palmsCount + pyramidsCount + touristsCount + bushesCount);
-        //update sprite top-position relatively to type
-        this.updateSpritesTop(this.oasisData, this.OASIS_HEIGHT);
-        this.updateSpritesTop(this.palmData, this.PALM_HEIGHT);
-        this.updateSpritesTop(this.pyramidData, this.PYRAMID_HEIGHT);
-        this.updateSpritesTop(this.touristData, this.TOURIST_HEIGHT);
-        this.updateSpritesTop(this.bushData, this.BUSH_HEIGHT);
-    },
-
     // Drawing..............................................................
 
     draw: function (now) {
@@ -899,7 +816,7 @@ CamelGame.prototype = {
             return 60;
         }
 
-        fps = CamelGame.GAME_SPEED / (now - this.lastAnimationFrameTime);
+        fps = 2000 / (now - this.lastAnimationFrameTime);
         this.lastAnimationFrameTime = now;
 
         if (now - this.lastFpsUpdateTime > 1000) {
@@ -982,7 +899,6 @@ CamelGame.prototype = {
         this.runner.jumping = false;
         this.runner.falling = false;
         this.runner.shooting = false;
-
 
         //spits
         this.runner.spit = new Sprite('spit',
@@ -1069,25 +985,10 @@ CamelGame.prototype = {
         };
 
         this.runner.shoot = function () {
-            if (this.shooting || CamelGame.waterProgressBar.getValue()<10) // 'this' is the runner
+            if (this.shooting) // 'this' is the runner
                 return;
             this.shooting = true;
         };
-    },
-
-    // Level statistics.....................................................
-    revealLevelStats: function() {
-        this.togglePaused();
-        this.levelStatsElement.style.display = 'block';
-        this.levelStatsScoreElement.innerHTML = this.score;
-    },
-
-    hideLevelStats: function() {
-        var STATS_REVEAL_DELAY = 1000;
-        CamelGame.levelStatsElement.style.display = 'none';
-        /*setTimeout( function (e) {
-            CamelGame.levelStatsElement.style.display = 'none';
-      }, this.STATS_REVEAL_DELAY);*/
     },
     // Toast................................................................
 
@@ -1151,55 +1052,16 @@ CamelGame.prototype = {
         }
     },
 
-    // Levels functions.....................................................
-    nextLevel: function () {
-        this.prev_score = this.score;
-        this.hideLevelStats();
-        this.setDefaultValues();
-        this.LEVEL++;
-        this.GAME_SPEED=this.GAME_SPEED-500;
-        /*setTimeout( function (e) {
-            CamelGame.revealLevelStats();
-        }, 2000); */
-        this.start();
-    },
-
-    restartLevel: function() {
-        this.insertIntoDataBase(this.player_name, this.score);
-        this.hideLevelStats();
-        this.setDefaultValues();
-        //this.start();
-
-
-        this.setVisibilityToAllSprites();
-        this.turnRight();
-        //this.start();
-    },
-
-    exitLevels: function (){
-        this.insertIntoDataBase(this.player_name, this.score);
-        this.hideLevelStats();
-
-        this.prev_score = 0;
-        this.score=0;
-        this.setDefaultValues();
-        this.LEVEL=1;
-        /*setTimeout( function (e) {
-         CamelGame.revealLevelStats();
-         }, 2000); */
-       // this.start();
-    },
     // ------------------------- INITIALIZATION ----------------------------
 
     start: function () {
-        this.generateLevel( this.LEVEL );
         this.createSprites();
         this.initializeImages();
         this.equipRunner();
 
         //DB
-        this.createOpenDataBase();
-        /*this.insertIntoDataBase(this.plyaer_name,this.score);
+      /*  this.createOpenDataBase();
+        this.insertIntoDataBase(this.plyaer_name,this.score);
         this.selectFromDataBase(); */
 
         this.healthProgressBar.adjustValue();
@@ -1228,7 +1090,7 @@ CamelGame.prototype = {
     positionSprites: function (sprites, spriteData) {
         var sprite;
 
-        for (var i = 0; i < spriteData.length; ++i) {
+        for (var i = 0; i < sprites.length; ++i) {
             sprite = sprites[i];
 
             sprite.top = spriteData[i].top;
@@ -1260,10 +1122,6 @@ CamelGame.prototype = {
                 sprite.draw(this.context);
 
                 this.context.translate(sprite.offset, 0);
-
-                if (this.spriteOffset >= this.LEVEL_END) {
-                    this.revealLevelStats();
-                }
             }
         }
     },
@@ -1297,7 +1155,6 @@ CamelGame.prototype = {
     },
 
     addSpritesToSpriteArray: function () {
-        this.sprites = [ this.runner ];
         for (var i = 0; i < this.oases.length; ++i) {
             this.sprites.push(this.oases[i]);
         }
@@ -1418,33 +1275,18 @@ CamelGame.prototype = {
     },
 
     selectFromDataBase: function () {
-        var items = new Array();
+        var items = [,];
         CamelGame.dataBase.transaction(function (tx) {
             tx.executeSql('SELECT * FROM STATISTICS ORDER BY SCORE DESC LIMIT 5', [], function (tx, results) {
                 var len = results.rows.length, i;
-                for (i = 0; i < len; i++) {
-                    items[i] = new Array(results.rows.item(i).NAME, results.rows.item(i).SCORE);
-                }
-
-                var table = document.getElementById('statistics_table');
-                var i;
-                table.innerHTML = '';
-
-                for (i = 0; i < items.length; i++) {
-                    var tr = document.createElement('tr');
-                    tr.id = i.toString();
-                    var td1 = document.createElement('td');
-                    var td2 = document.createElement('td');
-                    table.appendChild(tr);
-                    td1.innerHTML = items[i][0];
-                    document.getElementById(i.toString()).appendChild(td1);
-                    td2.innerHTML = items[i][1];
-                    document.getElementById(i.toString()).appendChild(td2);
+                for (i = 0; i < len; i++){
+                    items.push(results.rows.item(i).NAME,results.rows.item(i).SCORE );
+                  //  alert(items.pop());
                 }
             }, null);
         });
-
-    }
+        return items;
+    },
 };
 
 var CamelGame = new CamelGame();
@@ -1470,6 +1312,7 @@ document.getElementById('game-canvas').addEventListener("touchstart", function (
 document.getElementById('jumpButton').addEventListener("touchstart", function (e) {
     var touch = e.touches[0];
     CamelGame.runner.jump();
+	
 }, false);
 
 //touch on spit
@@ -1477,6 +1320,7 @@ document.getElementById('spitButton').addEventListener("touchstart", function (e
     var touch = e.touches[0];
     if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
         CamelGame.runner.shoot();
+		
     }
 }, false);
 
@@ -1505,11 +1349,18 @@ window.onkeydown = function (e) {
     else if (key === 32) { // 'space'
         if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
             CamelGame.runner.jump();
+			var audio=new Audio ();
+            audio.src='audio/pryjok.mp3';
+            audio.autoplay=true;
+			
         }
     }
     else if (key === 13) { // 'enter'
         if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
             CamelGame.runner.shoot();
+			var audio=new Audio ();
+            audio.src='audio/plevok.mp3';
+            audio.autoplay=true;
         }
     }
 }
@@ -1564,22 +1415,11 @@ function countdown(){
 // start
 $('#start_btn').click(function () {
     $('.start_wr').fadeOut(500, function(){
-        countdown();
         CamelGame.start();
+        stopgame();
+        countdown();
         $('#continue_btn').css('display', 'block');
     });
-});
-
-//statistics
-
-$('#statistics_btn').click(function () {
-    $('.statistics').fadeIn(500, function () {
-      CamelGame.selectFromDataBase();
-    });
-});
-
-$('#go_menu_btn').click(function () {
-    $('.statistics').fadeOut(500);
 });
 
 // exit
@@ -1597,7 +1437,10 @@ $('#settings_btn').click(function () {
     $('.settings_wr').slideToggle();
 });
 
-var ismuted = true;
+// sounds
+playSound('back');
+
+var ismuted = false;
 $(window).blur(function () {
     document.getElementById('audio_back').pause();
 });
@@ -1606,35 +1449,19 @@ $(window).focus(function () {
         document.getElementById('audio_back').play();
     }
 });
-
-// music btn
-$('#sound_yes').click(function(){
-    playSound('back');
-    $('.sound_settings_wr').fadeOut(400);
-    $('#music_btn').removeClass('sound_btn_off');
-    $('#sounds_btn').removeClass('sound_btn_off');
-});
-$('#sound_no').click(function(){
-    $('.sound_settings_wr').fadeOut(400);
-});
-
-var musicBtnClick = function(th){
-    if ($(th).hasClass('sound_btn_off')) {
-        $(th).removeClass('sound_btn_off');
+$('#music_btn').click(function () {
+    if ($(this).hasClass('sound_btn_off')) {
+        $(this).removeClass('sound_btn_off');
         document.getElementById('audio_back').muted = false;
         document.getElementById('audio_back').play();
         ismuted = false;
     } else {
-        $(th).addClass('sound_btn_off');
+        $(this).addClass('sound_btn_off');
         document.getElementById('audio_back').muted = true;
         document.getElementById('audio_back').pause();
         ismuted = true;
     }
-}
-$('#music_btn').click(function () {
-    musicBtnClick($(this));
-});    
-
+});
 $('#sounds_btn').click(function () {
     if ($(this).hasClass('sound_btn_off')) {
         $(this).removeClass('sound_btn_off');
@@ -1665,49 +1492,25 @@ function playSound(soundType) {
         audio.play();
         document.body.appendChild(audio);
     }
-};
+}
 
 $('#continue_btn').click(function(){
     $('.start_wr').fadeOut(500, function(){
         countdown();
-        CamelGame.start();
     });
-});
+})
 
 // pressing buttons on phone
 document.addEventListener("deviceready", function () {
     document.addEventListener("menubutton", function(){
         stopgame();
         $('.start_wr').fadeIn(300);
-    }, false);
+    }, true);
     document.addEventListener("backbutton", function(){
         e.preventDefault();
     }, false);
-    document.addEventListener("volumedownbutton", function (){
-        audio.volume--;
-    },false);
-    document.addEventListener("volumeupbutton", function (){
-        audio.volume++;
-    }, false);
 }, false);
 
-// buttons on level statistics elements
-document.getElementById("restart-level-btn").addEventListener("click", function (e) {
-    CamelGame.togglePaused();
-    CamelGame.restartLevel();
-}, false);
-
-document.getElementById("next-level-btn").addEventListener("click", function (e) {
-    CamelGame.togglePaused();
-    CamelGame.nextLevel();
-}, false);
-
-document.getElementById("to-menu-btn").addEventListener("click", function (e) {
-    CamelGame.exitLevels();
-    $('.start_wr').fadeIn(500, function(){
-        }
-    );
-}, false);
 
 });
 
