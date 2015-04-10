@@ -587,20 +587,23 @@ var CamelGame = function () {
                         break;
                     case 'palm':
                         CamelGame.decreaseHealth(sprite);
-                        audio.src='audio/udar.ogg';
-                        audio.autoplay=true;
+                        if (!isSoundsOff){
+                            playSound('udar',sounds);
+                        };
                         break;
                     case 'pyramid':
                         CamelGame.decreaseHealth(sprite);
-                        audio.src='audio/udar.ogg';
-                        audio.autoplay=true;
+                        if (!isSoundsOff){
+                            playSound('udar',sounds);
+                        };
                         break;
                     case 'tourist':
                         CamelGame.decreaseHealth(sprite);
                         this.adjustScore(sprite);
                         CamelGame.splashToast('Попал в кадр!', 1000);
-                        audio.src='audio/foto.mp3';
-                        audio.autoplay=true;
+                        if (!isSoundsOff){
+                            playSound('foto',sounds);
+                        };
                         break;
                     default:
                         break;
@@ -682,28 +685,32 @@ var CamelGame = function () {
             switch (other_sprite.type) {
                 case 'bush':
                     CamelGame.nothingDuing(sprite);
-                    audio.src='audio/pl_stolkn.mp3';
-                    audio.autoplay=true;
+                    if (!isSoundsOff){
+                        playSound('pl_stolkn',sounds);
+                    }
                     break;
                 case 'oasis':
                     break;
                 case 'palm':
                     CamelGame.nothingDuing(sprite);
-                    audio.src='audio/pl_stolkn.mp3';
-                    audio.autoplay=true;
+                    if (!isSoundsOff){
+                        playSound('pl_stolkn',sounds);
+                    }
                     break;
                 case 'pyramid':
                     CamelGame.nothingDuing(sprite);
-                    audio.src='audio/pl_stolkn.mp3';
-                    audio.autoplay=true;
+                    if (!isSoundsOff){
+                        playSound('pl_stolkn',sounds);
+                    }
                     break;
                 case 'tourist':
                     this.adjustScore(other_sprite);
                     sprite.visible = false;
                     CamelGame.runner.shooting = false;
                     other_sprite.visible=false;
-                    audio.src='audio/smeh.mp3';
-                    audio.autoplay=true;
+                    if (!isSoundsOff){
+                        playSound('smeh',sounds);
+                    }
                     CamelGame.splashToast('В точку!!!', 1000);
                     break;
                 default:
@@ -1465,6 +1472,7 @@ CamelGame.prototype = {
 };
 
 var CamelGame = new CamelGame();
+var music = new Audio(), sounds = new Audio();
 
 // Event handlers.......................................................
 
@@ -1525,16 +1533,17 @@ window.onkeydown = function (e) {
     else if (key === 32) { // 'space'
         if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
             CamelGame.runner.jump();
-            audio.src='audio/pryjok.mp3';
-            audio.autoplay=true;
-			
+            if (!isSoundsOff){
+                playSound('pryjok',sounds);
+            }			
         }
     }
     else if (key === 13) { // 'enter'
         if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
             CamelGame.runner.shoot();
-            audio.src='audio/plevok.mp3';
-            audio.autoplay=true;
+            if (!isSoundsOff){
+                playSound('plevok',sounds);
+            }
         }
     }
 }
@@ -1614,6 +1623,7 @@ $('#exit_btn').click(function(){
 
 // settings dropdown
 $('#settings_btn').click(function () {
+    $('.sound_settings_wr').hide();
     if ($(this).hasClass('opened')) {
         $(this).removeClass('opened');
     } else {
@@ -1623,29 +1633,49 @@ $('#settings_btn').click(function () {
 });
 
 // sounds
-var ismuted = true;
+ismuted = true, isSoundsOff = true;
 
 $(window).blur(function () {
-    // document.getElementById('audio_back').pause();
+    if (!ismuted) {
+        stopSound('music');
+        ismuted = false;
+    }
 });
 $(window).focus(function () {
     if (!ismuted) {
-        // document.getElementById('audio_back').play();
+        playSound('music', music);
     };
 });
 // music btn
-var music = new Audio();
-function playSound(soundType) {
-    ismuted = false;
-
+function playSound(soundType, audioVar) {
     if (soundType === "music"){
-        music.src='audio/music.mp3';
-        music.volume=0.15;
-        music.autoplay = true;
+        ismuted = false;
+        audioVar.volume=0.15;
+    } else {
+        audioVar.volume=0.6;
+    }
+
+    var codec = getSupport(audioVar);
+    if (!codec) throw 'AudioNotSupported';
+    audioVar.src = 'audio/' + soundType + '.' + codec;
+    audioVar.load();
+    audioVar.autoplay = true;
+    audioVar.play();
+}
+function getSupport(audio) {
+    return !audio.canPlayType ? false :
+    audio.canPlayType('audio/ogg;')  ? 'ogg' :
+    audio.canPlayType('audio/mpeg;') ? 'mp3' : false;
+}
+function stopSound(soundType){
+    if (soundType === "music"){
+        ismuted = true;
+        music.pause();
     }
 }
 $('#sound_yes').click(function(){
-    playSound('music');
+    playSound('music', music);
+    isSoundsOff = false;
     $('.sound_settings_wr').fadeOut(400);
     $('#music_btn').removeClass('sound_btn_off');
     $('#sounds_btn').removeClass('sound_btn_off');
@@ -1657,14 +1687,10 @@ $('#sound_no').click(function(){
 var musicBtnClick = function(th){
     if ($(th).hasClass('sound_btn_off')) {
         $(th).removeClass('sound_btn_off');
-        document.getElementById('audio_back').muted = false;
-        document.getElementById('audio_back').play();
-        ismuted = false;
+        playSound('music', music);
     } else {
         $(th).addClass('sound_btn_off');
-        document.getElementById('audio_back').muted = true;
-        document.getElementById('audio_back').pause();
-        ismuted = true;
+        stopSound('music');
     }
 }
 $('#music_btn').click(function () {
@@ -1673,8 +1699,10 @@ $('#music_btn').click(function () {
 $('#sounds_btn').click(function () {
     if ($(this).hasClass('sound_btn_off')) {
         $(this).removeClass('sound_btn_off');
+        isSoundsOff = false;
     } else {
         $(this).addClass('sound_btn_off');
+        isSoundsOff = true;
     }
 });
 
