@@ -5,126 +5,126 @@ var CamelGame = function () {
     this.canvas = document.getElementById('game-canvas');
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
-    this.context = this.canvas.getContext('2d'),
+    this.context = this.canvas.getContext('2d');
 
     // HTML elements........................................................
 
-    this.fpsElement = document.getElementById('fps'),
-    this.toast = document.getElementById('toast'),
-    this.scoreElement = document.getElementById('score_element'),
-    this.healthProgressBar = new ProgressBar('#health'),
-    this.waterProgressBar = new ProgressBar('#water'),
-    this.levelStatsElement = document.getElementById("level-stats"),
-    this.levelStatsScoreElement = document.getElementById("level-stats-score"),
+    this.fpsElement = document.getElementById('fps');
+    this.toast = document.getElementById('toast');
+    this.scoreElement = document.getElementById('score_element');
+    this.healthProgressBar = new ProgressBar('#health');
+    this.waterProgressBar = new ProgressBar('#water');
+    this.levelStatsElement = document.getElementById("level-stats");
+    this.levelStatsScoreElement = document.getElementById("level-stats-score");
     // Constants............................................................
 
-    this.LEVEL = 1,
-    this.LEFT = 1,
-    this.RIGHT = 2,
-    this.STATIONARY = 3,
+    this.LEVEL = 1;
+    this.LEFT = 1;
+    this.RIGHT = 2;
+    this.STATIONARY = 3;
     this.LEVEL_END;
     this.GAME_SPEED=2000;
 
     // Constants are listed in alphabetical order from here on out
 
-    this.BACKGROUND_VELOCITY = 100,
-    this.DEFAULT_TOAST_TIME = 1000,
+    this.BACKGROUND_VELOCITY = 100;
+    this.DEFAULT_TOAST_TIME = 1000;
 
-    this.PAUSED_CHECK_INTERVAL = 200,
+    this.PAUSED_CHECK_INTERVAL = 200;
 
-    this.CAMEL_CELLS_HEIGHT = 60,
+    this.CAMEL_CELLS_HEIGHT = 60;
 
-    this.STARTING_BACKGROUND_VELOCITY = 0,
+    this.STARTING_BACKGROUND_VELOCITY = 0;
 
-    this.STARTING_BACKGROUND_OFFSET = 0,
-    this.INITIAL_BACKGROUND_OFFSET = 0,
+    this.STARTING_BACKGROUND_OFFSET = 0;
+    this.INITIAL_BACKGROUND_OFFSET = 0;
 
-    this.STARTING_RUNNER_LEFT = 50,
-    this.STARTING_PAGEFLIP_INTERVAL = -1,
-    this.STARTING_RUNNER_TRACK = 1,
-    this.STARTING_RUNNER_VELOCITY = 0,
+    this.STARTING_RUNNER_LEFT = 50;
+    this.STARTING_PAGEFLIP_INTERVAL = -1;
+    this.STARTING_RUNNER_TRACK = 1;
+    this.STARTING_RUNNER_VELOCITY = 0;
 
-    this.GRAVITY_FORCE = 9.81,
+    this.GRAVITY_FORCE = 9.81;
     this.PIXELS_PER_METER = this.canvas.width / 10; // 10 meters, randomly selected width
 
-    this.OASIS_CELLS_HEIGHT = 90,
-    this.OASIS_CELLS_WIDTH = 90,
+    this.OASIS_CELLS_HEIGHT = 90;
+    this.OASIS_CELLS_WIDTH = 90;
 
-    this.TOURIST_CELLS_HEIGHT = 130,
-    this.TOURIST_CELLS_WIDTH = 90,
+    this.TOURIST_CELLS_HEIGHT = 130;
+    this.TOURIST_CELLS_WIDTH = 90;
 
-    this.BUSH_CELLS_WIDTH = 160,
-    this.BUSH_CELLS_HEIGHT = 102,
+    this.BUSH_CELLS_WIDTH = 160;
+    this.BUSH_CELLS_HEIGHT = 102;
 
-    this.PALM_CELLS_WIDTH = 143,
-    this.PALM_CELLS_HEIGHT = 231,
+    this.PALM_CELLS_WIDTH = 143;
+    this.PALM_CELLS_HEIGHT = 231;
 
     //
-    this.OASIS_WIDTH = 100,
-    this.OASIS_HEIGHT = 80,
+    this.OASIS_WIDTH = 100;
+    this.OASIS_HEIGHT = 80;
 
-    this.TOURIST_WIDTH = 80,
-    this.TOURIST_HEIGHT = 100,
+    this.TOURIST_WIDTH = 80;
+    this.TOURIST_HEIGHT = 100;
 
-    this.PYRAMID_WIDTH = 90,
-    this.PYRAMID_HEIGHT = 90,
+    this.PYRAMID_WIDTH = 90;
+    this.PYRAMID_HEIGHT = 90;
 
-    this.CAMEL_WIDTH = 80,
-    this.CAMEL_HEIGHT = 60,
+    this.CAMEL_WIDTH = 80;
+    this.CAMEL_HEIGHT = 60;
 
-    this.BUSH_WIDTH = 90,
-    this.BUSH_HEIGHT = 90,
+    this.BUSH_WIDTH = 90;
+    this.BUSH_HEIGHT = 90;
 
-    this.PALM_WIDTH = 80,
-    this.PALM_HEIGHT = 130,
+    this.PALM_WIDTH = 80;
+    this.PALM_HEIGHT = 130;
 
-    this.SPIT_WIDTH = 50,
-    this.SPIT_HEIGHT = 50,
+    this.SPIT_WIDTH = 50;
+    this.SPIT_HEIGHT = 50;
     // Paused............................................................
 
-    this.paused = false,
-    this.pauseStartTime = 0,
-    this.totalTimePaused = 0,
+    this.paused = false;
+    this.pauseStartTime = 0;
+    this.totalTimePaused = 0;
 
-    this.windowHasFocus = true,
+    this.windowHasFocus = true;
 
     // Track baselines...................................................
 
-    this.TRACK_1_BASELINE = this.canvas.height,
-    this.TRACK_2_BASELINE = this.canvas.height / 4 * 3,
-    this.TRACK_3_BASELINE = this.canvas.height / 4 * 2,
+    this.TRACK_1_BASELINE = this.canvas.height;
+    this.TRACK_2_BASELINE = this.canvas.height / 4 * 3;
+    this.TRACK_3_BASELINE = this.canvas.height / 4 * 2;
 
     // Fps indicator.....................................................
 
-    this.fpsToast = document.getElementById('fps'),
+    this.fpsToast = document.getElementById('fps');
 
     // Images............................................................
 
-    this.background = new Image(),
-    this.runnerImage = new Image(),
-    this.spritesheet = new Image(),
+    this.background = new Image();
+    this.runnerImage = new Image();
+    this.spritesheet = new Image();
     // Time..............................................................
 
-    this.lastAnimationFrameTime = 0,
-    this.lastFpsUpdateTime = 0,
-    this.fps = 60,
+    this.lastAnimationFrameTime = 0;
+    this.lastFpsUpdateTime = 0;
+    this.fps = 60;
 
     // Runner track......................................................
 
-    this.runnerTrack = this.STARTING_RUNNER_TRACK,
+    this.runnerTrack = this.STARTING_RUNNER_TRACK;
 
     // Pageflip timing for runner........................................
 
-    this.runnerPageflipInterval = this.STARTING_PAGEFLIP_INTERVAL,
+    this.runnerPageflipInterval = this.STARTING_PAGEFLIP_INTERVAL;
 
     // Scrolling direction...............................................
 
-    this.scrollingDirection = this.STATIONARY,
+    this.scrollingDirection = this.STATIONARY;
 
     // Translation offsets...............................................
 
-    this.backgroundOffset = this.STARTING_BACKGROUND_OFFSET,
-    this.spriteOffset = this.INITIAL_BACKGROUND_OFFSET,
+    this.backgroundOffset = this.STARTING_BACKGROUND_OFFSET;
+    this.spriteOffset = this.INITIAL_BACKGROUND_OFFSET;
 
     // Velocities........................................................
 
@@ -497,7 +497,7 @@ var CamelGame = function () {
                         this.fallOnPlatform(sprite);
                         sprite.stopFalling();
                     }
-                    else */{
+                    else {*/
                         sprite.track--;
 
                         sprite.top += deltaY;
@@ -520,8 +520,9 @@ var CamelGame = function () {
 
                 for (var i = 0; i < CamelGame.sprites.length; ++i) {
                     otherSprite = CamelGame.sprites[i];
-                    if (CamelGame.runner.jumping == true)
+                    if (CamelGame.runner.jumping == true) {
                         return;
+                    }
                     if (this.isCandidateForCollision(sprite, otherSprite)) {
                         if (this.didCollide(sprite, otherSprite, context)) {
                             this.processCollision(sprite, otherSprite);
@@ -575,8 +576,9 @@ var CamelGame = function () {
             processCollision: function (sprite, sprite) {
                 if (sprite.value) { // Modify Camel Game sprites so they have values
                     // Keep score...
-                }
+                };
 
+                var audio=new Audio ();
                 switch (sprite.type) {
                     case 'bush':
                         CamelGame.increaseHealth(sprite);					
@@ -586,23 +588,22 @@ var CamelGame = function () {
                         break;
                     case 'palm':
                         CamelGame.decreaseHealth(sprite);
-						var audio=new Audio ();
                         audio.src='audio/udar.ogg';
                         audio.autoplay=true;
                         break;
                     case 'pyramid':
                         CamelGame.decreaseHealth(sprite);
-						var audio=new Audio ();
                         audio.src='audio/udar.ogg';
                         audio.autoplay=true;
                         break;
                     case 'tourist':
                         CamelGame.decreaseHealth(sprite);
-                        this.adjustScore(sprite)
+                        this.adjustScore(sprite);
                         CamelGame.splashToast('Попал в кадр!', 1000);
-						var audio=new Audio ();
                         audio.src='audio/foto.mp3';
                         audio.autoplay=true;
+                        break;
+                    default:
                         break;
                 }
             },
@@ -626,8 +627,9 @@ var CamelGame = function () {
 
             for (var i = 0; i < CamelGame.sprites.length; ++i) {
                 otherSprite = CamelGame.sprites[i];
-                if (otherSprite.type == 'runner')
+                if (otherSprite.type == 'runner'){
                     continue;
+                }
                 if (this.isCandidateForCollisionSpit(sprite, otherSprite)) {
                     if (this.didCollideSpit(sprite, otherSprite, context)) {
                         this.processCollisionSpit(sprite, otherSprite);
@@ -675,12 +677,12 @@ var CamelGame = function () {
         processCollisionSpit: function (sprite, other_sprite) {
             if (sprite.value) { // Modify Camel Game sprites so they have values
                 // Keep score...
-            }
+            };
 
+			var audio=new Audio ();
             switch (other_sprite.type) {
                 case 'bush':
                     CamelGame.nothingDuing(sprite);
-					var audio=new Audio ();
                     audio.src='audio/pl_stolkn.mp3';
                     audio.autoplay=true;
                     break;
@@ -688,13 +690,11 @@ var CamelGame = function () {
                     break;
                 case 'palm':
                     CamelGame.nothingDuing(sprite);
-					var audio=new Audio ();
                     audio.src='audio/pl_stolkn.mp3';
                     audio.autoplay=true;
                     break;
                 case 'pyramid':
                     CamelGame.nothingDuing(sprite);
-					var audio=new Audio ();
                     audio.src='audio/pl_stolkn.mp3';
                     audio.autoplay=true;
                     break;
@@ -703,10 +703,11 @@ var CamelGame = function () {
                     sprite.visible = false;
                     CamelGame.runner.shooting = false;
                     other_sprite.visible=false;
-                    var audio=new Audio ();
                     audio.src='audio/smeh.mp3';
                     audio.autoplay=true;
                     CamelGame.splashToast('В точку!!!', 1000);
+                    break;
+                default:
                     break;
             }
         },
@@ -751,8 +752,9 @@ var CamelGame = function () {
 CamelGame.prototype = {
     setVisibilityToAllSprites: function () {
         for (var i = 0; i < this.sprites.length; i++) {
-            if (this.sprites[i].type !== 'spit') 
+            if (this.sprites[i].type !== 'spit') {
                 this.sprites[i].visible = true;
+            }
         }
     }, 
 
@@ -801,6 +803,8 @@ CamelGame.prototype = {
                 pyramidsCount = 12;
                 touristsCount = 20;
                 bushesCount = 5;
+                break;
+            default:
                 break;
         }
 
@@ -1086,8 +1090,9 @@ CamelGame.prototype = {
         };
 
         this.runner.shoot = function () {
-            if (this.shooting || CamelGame.waterProgressBar.getValue()<10) // 'this' is the runner
+            if (this.shooting || CamelGame.waterProgressBar.getValue()<10){
                 return;
+            }; // 'this' is the runner
             this.shooting = true;
         };
     },
@@ -1317,23 +1322,19 @@ CamelGame.prototype = {
         this.sprites = [ this.runner ]; 
         for (var i = 0; i < this.oases.length; ++i) {
             this.sprites.push(this.oases[i]);
-        }
+        };
         for (var i = 0; i < this.tourists.length; ++i) {
             this.sprites.push(this.tourists[i]);
-        }
-        ;
+        };
         for (var i = 0; i < this.pyramids.length; ++i) {
             this.sprites.push(this.pyramids[i]);
-        }
-        ;
+        };
         for (var i = 0; i < this.bushes.length; ++i) {
             this.sprites.push(this.bushes[i]);
-        }
-        ;
+        };
         for (var i = 0; i < this.palms.length; ++i) {
             this.sprites.push(this.palms[i]);
-        }
-        ;
+        };
     },
 
     createTouristSprites: function () {
@@ -1464,37 +1465,37 @@ CamelGame.prototype = {
     }
 };
 
-var CamelGame = new CamelGame();
+var camelGameObj = new CamelGame();
 
 // Event handlers.......................................................
 
 //touch on canvas - camel must change track
 document.getElementById('game-canvas').addEventListener("touchstart", function (e) {
     var touch = e.touches[0];
-    var trackHeight = CamelGame.canvas.height / 4;
+    var trackHeight = camelGameObj.canvas.height / 4;
     var trackNum = 4 - parseInt(touch.pageY / trackHeight);
-    if (trackNum > CamelGame.runnerTrack) {
-        CamelGame.runner.up();
-        CamelGame.runnerTrack++;
+    if (trackNum > camelGameObj.runnerTrack) {
+        camelGameObj.runner.up();
+        camelGameObj.runnerTrack++;
     }
-    else if (trackNum < CamelGame.runnerTrack) {
-        CamelGame.runner.down();
-        CamelGame.runnerTrack--;
+    else if (trackNum < camelGameObj.runnerTrack) {
+        camelGameObj.runner.down();
+        camelGameObj.runnerTrack--;
     }
 }, false);
 
 //touch on jump
 document.getElementById('jumpButton').addEventListener("touchstart", function (e) {
     var touch = e.touches[0];
-    CamelGame.runner.jump();
+    camelGameObj.runner.jump();
 
 }, false);
 
 //touch on spit
 document.getElementById('spitButton').addEventListener("touchstart", function (e) {
     var touch = e.touches[0];
-    if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
-        CamelGame.runner.shoot();
+    if (!camelGameObj.runner.jumping && !camelGameObj.runner.falling) {
+        camelGameObj.runner.shoot();
 		
     }
 }, false);
@@ -1502,38 +1503,37 @@ document.getElementById('spitButton').addEventListener("touchstart", function (e
 
 window.onkeydown = function (e) {
     var key = e.keyCode;
+    var audio=new Audio();
 
-    if (key === 80 || (CamelGame.paused && key !== 80)) {  // 'p'
-        CamelGame.togglePaused();
+    if (key === 80 || (camelGameObj.paused && key !== 80)) {  // 'p'
+        camelGameObj.togglePaused();
     }
 
     else if (key === 74 || key === 38 || key===87) { // 'j or Up or w'
-        if (CamelGame.runnerTrack === 3) {
+        if (camelGameObj.runnerTrack === 3) {
             return;
         }
-        CamelGame.runner.up();
-        CamelGame.runnerTrack++;
+        camelGameObj.runner.up();
+        camelGameObj.runnerTrack++;
     }
     else if (key === 70 || key===40 || key===83) { // 'f or Down or s'
-        if (CamelGame.runnerTrack === 1) {
+        if (camelGameObj.runnerTrack === 1) {
             return;
         }
-        CamelGame.runner.down();
-        CamelGame.runnerTrack--;
+        camelGameObj.runner.down();
+        camelGameObj.runnerTrack--;
     }
     else if (key === 32) { // 'space'
-        if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
-            CamelGame.runner.jump();
-			var audio=new Audio ();
+        if (!camelGameObj.runner.jumping && !camelGameObj.runner.falling) {
+            camelGameObj.runner.jump();
             audio.src='audio/pryjok.mp3';
             audio.autoplay=true;
 			
         }
     }
     else if (key === 13) { // 'enter'
-        if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
-            CamelGame.runner.shoot();
-			var audio=new Audio ();
+        if (!camelGameObj.runner.jumping && !camelGameObj.runner.falling) {
+            camelGameObj.runner.shoot();
             audio.src='audio/plevok.mp3';
             audio.autoplay=true;
         }
@@ -1541,45 +1541,45 @@ window.onkeydown = function (e) {
 }
 
 window.onresize = function (e) { // change canvas size when window resize
-    CamelGame.canvas.width = window.innerWidth;
-    CamelGame.canvas.height = window.innerHeight;
+    camelGameObj.canvas.width = window.innerWidth;
+    camelGameObj.canvas.height = window.innerHeight;
 }
 
 window.onblur = stopgame; // pause if unpaused
 
 function stopgame(){
-    CamelGame.windowHasFocus = false;
+    camelGameObj.windowHasFocus = false;
 
-    if (!CamelGame.paused) {
-        CamelGame.togglePaused();
+    if (!camelGameObj.paused) {
+        camelGameObj.togglePaused();
     }
 }
 
 window.onfocus = countdown;  // unpause if paused
 
 function countdown(){
-    var originalFont = CamelGame.toast.style.fontSize;
+    var originalFont = camelGameObj.toast.style.fontSize;
 
-    CamelGame.windowHasFocus = true;
+    camelGameObj.windowHasFocus = true;
 
-    if (CamelGame.paused) {
-        CamelGame.toast.style.font = '128px fantasy';
+    if (camelGameObj.paused) {
+        camelGameObj.toast.style.font = '128px fantasy';
 
-        CamelGame.splashToast('3', 500); // Display 3 for one half second
+        camelGameObj.splashToast('3', 500); // Display 3 for one half second
 
         setTimeout(function () {
-            CamelGame.splashToast('2', 500); // Display 2 for one half second
+            camelGameObj.splashToast('2', 500); // Display 2 for one half second
 
             setTimeout(function () {
-                CamelGame.splashToast('1', 500); // Display 1 for one half second
+                camelGameObj.splashToast('1', 500); // Display 1 for one half second
 
                 setTimeout(function () {
-                    if (CamelGame.windowHasFocus) {
-                        CamelGame.togglePaused();
+                    if (camelGameObj.windowHasFocus) {
+                        camelGameObj.togglePaused();
                     }
 
                     setTimeout(function () { // Wait for '1' to disappear
-                        CamelGame.toast.style.fontSize = originalFont;
+                        camelGameObj.toast.style.fontSize = originalFont;
                     }, 2000);
                 }, 1000);
             }, 1000);
@@ -1591,7 +1591,7 @@ function countdown(){
 $('#start_btn').click(function () {
     $('.start_wr').fadeOut(500, function(){
         countdown();
-        CamelGame.start();
+        camelGameObj.start();
         $('#continue_btn').css('display', 'block');
     });
 });
@@ -1600,7 +1600,7 @@ $('#start_btn').click(function () {
 
 $('#statistics_btn').click(function () {
     $('.statistics').fadeIn(500, function () {
-      CamelGame.selectFromDataBase();
+      camelGameObj.selectFromDataBase();
     });
 });
 
@@ -1632,7 +1632,7 @@ $(window).blur(function () {
 $(window).focus(function () {
     if (!ismuted) {
         // document.getElementById('audio_back').play();
-    }
+    };
 });
 // music btn
 var music = new Audio();
@@ -1682,7 +1682,7 @@ $('#sounds_btn').click(function () {
 $('#continue_btn').click(function(){
     $('.start_wr').fadeOut(500, function(){
         countdown();
-        CamelGame.start(); 
+        camelGameObj.start(); 
     });
 })
 
@@ -1705,17 +1705,17 @@ document.addEventListener("deviceready", function () {
 
 // buttons on level statistics elements
 document.getElementById("restart-level-btn").addEventListener("click", function (e) {
-    CamelGame.togglePaused();
-    CamelGame.restartLevel();
+    camelGameObj.togglePaused();
+    camelGameObj.restartLevel();
 }, false);
 
 document.getElementById("next-level-btn").addEventListener("click", function (e) {
-    CamelGame.togglePaused();
-    CamelGame.nextLevel();
+    camelGameObj.togglePaused();
+    camelGameObj.nextLevel();
 }, false);
 
 document.getElementById("to-menu-btn").addEventListener("click", function (e) {
-    CamelGame.exitLevels();
+    camelGameObj.exitLevels();
     $('.start_wr').fadeIn(500, function(){
         }
     );
