@@ -509,8 +509,7 @@ var CamelGame = function () {
                         }
                     }
                 }
-            }
-        },
+            },
         //collisions
         this.collideBehavior = {
             execute: function (sprite, time, fps, context) {
@@ -1465,37 +1464,37 @@ CamelGame.prototype = {
     }
 };
 
-var camelGameObj = new CamelGame();
+var CamelGame = new CamelGame();
 
 // Event handlers.......................................................
 
 //touch on canvas - camel must change track
 document.getElementById('game-canvas').addEventListener("touchstart", function (e) {
     var touch = e.touches[0];
-    var trackHeight = camelGameObj.canvas.height / 4;
+    var trackHeight = CamelGame.canvas.height / 4;
     var trackNum = 4 - parseInt(touch.pageY / trackHeight);
-    if (trackNum > camelGameObj.runnerTrack) {
-        camelGameObj.runner.up();
-        camelGameObj.runnerTrack++;
+    if (trackNum > CamelGame.runnerTrack) {
+        CamelGame.runner.up();
+        CamelGame.runnerTrack++;
     }
-    else if (trackNum < camelGameObj.runnerTrack) {
-        camelGameObj.runner.down();
-        camelGameObj.runnerTrack--;
+    else if (trackNum < CamelGame.runnerTrack) {
+        CamelGame.runner.down();
+        CamelGame.runnerTrack--;
     }
 }, false);
 
 //touch on jump
 document.getElementById('jumpButton').addEventListener("touchstart", function (e) {
     var touch = e.touches[0];
-    camelGameObj.runner.jump();
+    CamelGame.runner.jump();
 
 }, false);
 
 //touch on spit
 document.getElementById('spitButton').addEventListener("touchstart", function (e) {
     var touch = e.touches[0];
-    if (!camelGameObj.runner.jumping && !camelGameObj.runner.falling) {
-        camelGameObj.runner.shoot();
+    if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
+        CamelGame.runner.shoot();
 		
     }
 }, false);
@@ -1505,35 +1504,35 @@ window.onkeydown = function (e) {
     var key = e.keyCode;
     var audio=new Audio();
 
-    if (key === 80 || (camelGameObj.paused && key !== 80)) {  // 'p'
-        camelGameObj.togglePaused();
+    if (key === 80 || (CamelGame.paused && key !== 80)) {  // 'p'
+        CamelGame.togglePaused();
     }
 
     else if (key === 74 || key === 38 || key===87) { // 'j or Up or w'
-        if (camelGameObj.runnerTrack === 3) {
+        if (CamelGame.runnerTrack === 3) {
             return;
         }
-        camelGameObj.runner.up();
-        camelGameObj.runnerTrack++;
+        CamelGame.runner.up();
+        CamelGame.runnerTrack++;
     }
     else if (key === 70 || key===40 || key===83) { // 'f or Down or s'
-        if (camelGameObj.runnerTrack === 1) {
+        if (CamelGame.runnerTrack === 1) {
             return;
         }
-        camelGameObj.runner.down();
-        camelGameObj.runnerTrack--;
+        CamelGame.runner.down();
+        CamelGame.runnerTrack--;
     }
     else if (key === 32) { // 'space'
-        if (!camelGameObj.runner.jumping && !camelGameObj.runner.falling) {
-            camelGameObj.runner.jump();
+        if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
+            CamelGame.runner.jump();
             audio.src='audio/pryjok.mp3';
             audio.autoplay=true;
 			
         }
     }
     else if (key === 13) { // 'enter'
-        if (!camelGameObj.runner.jumping && !camelGameObj.runner.falling) {
-            camelGameObj.runner.shoot();
+        if (!CamelGame.runner.jumping && !CamelGame.runner.falling) {
+            CamelGame.runner.shoot();
             audio.src='audio/plevok.mp3';
             audio.autoplay=true;
         }
@@ -1541,45 +1540,45 @@ window.onkeydown = function (e) {
 }
 
 window.onresize = function (e) { // change canvas size when window resize
-    camelGameObj.canvas.width = window.innerWidth;
-    camelGameObj.canvas.height = window.innerHeight;
+    CamelGame.canvas.width = window.innerWidth;
+    CamelGame.canvas.height = window.innerHeight;
 }
 
 window.onblur = stopgame; // pause if unpaused
 
 function stopgame(){
-    camelGameObj.windowHasFocus = false;
+    CamelGame.windowHasFocus = false;
 
-    if (!camelGameObj.paused) {
-        camelGameObj.togglePaused();
+    if (!CamelGame.paused) {
+        CamelGame.togglePaused();
     }
 }
 
 window.onfocus = countdown;  // unpause if paused
 
 function countdown(){
-    var originalFont = camelGameObj.toast.style.fontSize;
+    var originalFont = CamelGame.toast.style.fontSize;
 
-    camelGameObj.windowHasFocus = true;
+    CamelGame.windowHasFocus = true;
 
-    if (camelGameObj.paused) {
-        camelGameObj.toast.style.font = '128px fantasy';
+    if (CamelGame.paused) {
+        CamelGame.toast.style.font = '128px fantasy';
 
-        camelGameObj.splashToast('3', 500); // Display 3 for one half second
+        CamelGame.splashToast('3', 500); // Display 3 for one half second
 
         setTimeout(function () {
-            camelGameObj.splashToast('2', 500); // Display 2 for one half second
+            CamelGame.splashToast('2', 500); // Display 2 for one half second
 
             setTimeout(function () {
-                camelGameObj.splashToast('1', 500); // Display 1 for one half second
+                CamelGame.splashToast('1', 500); // Display 1 for one half second
 
                 setTimeout(function () {
-                    if (camelGameObj.windowHasFocus) {
-                        camelGameObj.togglePaused();
+                    if (CamelGame.windowHasFocus) {
+                        CamelGame.togglePaused();
                     }
 
                     setTimeout(function () { // Wait for '1' to disappear
-                        camelGameObj.toast.style.fontSize = originalFont;
+                        CamelGame.toast.style.fontSize = originalFont;
                     }, 2000);
                 }, 1000);
             }, 1000);
@@ -1591,7 +1590,7 @@ function countdown(){
 $('#start_btn').click(function () {
     $('.start_wr').fadeOut(500, function(){
         countdown();
-        camelGameObj.start();
+        CamelGame.start();
         $('#continue_btn').css('display', 'block');
     });
 });
@@ -1600,7 +1599,7 @@ $('#start_btn').click(function () {
 
 $('#statistics_btn').click(function () {
     $('.statistics').fadeIn(500, function () {
-      camelGameObj.selectFromDataBase();
+      CamelGame.selectFromDataBase();
     });
 });
 
@@ -1682,7 +1681,7 @@ $('#sounds_btn').click(function () {
 $('#continue_btn').click(function(){
     $('.start_wr').fadeOut(500, function(){
         countdown();
-        camelGameObj.start(); 
+        CamelGame.start(); 
     });
 })
 
@@ -1705,17 +1704,17 @@ document.addEventListener("deviceready", function () {
 
 // buttons on level statistics elements
 document.getElementById("restart-level-btn").addEventListener("click", function (e) {
-    camelGameObj.togglePaused();
-    camelGameObj.restartLevel();
+    CamelGame.togglePaused();
+    CamelGame.restartLevel();
 }, false);
 
 document.getElementById("next-level-btn").addEventListener("click", function (e) {
-    camelGameObj.togglePaused();
-    camelGameObj.nextLevel();
+    CamelGame.togglePaused();
+    CamelGame.nextLevel();
 }, false);
 
 document.getElementById("to-menu-btn").addEventListener("click", function (e) {
-    camelGameObj.exitLevels();
+    CamelGame.exitLevels();
     $('.start_wr').fadeIn(500, function(){
         }
     );
