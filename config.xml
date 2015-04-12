@@ -1,9 +1,9 @@
-﻿ <?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- config.xml reference: https://build.phonegap.com/docs/config-xml -->
 
  <widget id="com.16mb.camel-game" version="0.5.1">
-        <name>Camel Spit&Run</name>
+        <name>Camel Spit and Run</name>
         <description>
             Camel spit on tourist and runs.
         </description>
@@ -26,7 +26,6 @@
 		<preference name="exit-on-suspend"            value="true" />          <!-- ios: if set to true, app will terminate when home button is pressed -->
 		<preference name="orientation" value="landscape" />
 		<preference name="android-installLocation"    value="preferExternal" />           <!-- android: app install location. 'auto' will choose. 'internalOnly' is device memory. 'preferExternal' is SDCard. -->
-		
 		<!-- Plugins -->
 
 		<!-- Core plugins -->
