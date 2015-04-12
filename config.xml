@@ -1,0 +1,16 @@
+ <widget id="com.16mb.camel-game" version="0.5.1">
+        <name>Camel Spit&Run</name>
+        <description>
+            Camel spit on tourist and runs.
+        </description>
+        <author email="ipz11ukr@gmail.com" href="https://github.com/yaKostin/Camel-Spit-Run-game">
+           Kostin Yaroslav
+		   Basanets Daniil
+		   Yampolskij Sergey
+		   Kovalenko Yaroslava
+		   Chornaya Anastasiya
+		   Litvyak Alexey
+        </author>
+        <content src="index.html" />
+        <access origin="*" />
+    </widget>
