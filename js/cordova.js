@@ -19,7 +19,7 @@
  *
 */
 
-if ("cordova" in window) { throw new Error("cordova already defined"); };
+if ("cordova" in window) {alert("cordova already defined"); throw new Error("cordova already defined"); };
 
 
 var channel = require('cordova/channel');
